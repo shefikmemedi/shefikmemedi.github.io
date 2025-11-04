@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Homework 5 — Measures of Location & Dispersion | Cybersecurity Statistics Blog</title>
+
+  <!-- Basic styling -->
+  <style>
+    :root{
+      --bg:#f7fafc;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --accent:#0f172a;
+      --primary:#0ea5a4;
+      --maxw:1000px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Segoe UI Mono", monospace;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background:var(--bg);
+      color:var(--accent);
+      line-height:1.6;
+    }
+    header{
+      background: linear-gradient(180deg, #0f172a 0%, #071033 100%);
+      color:white;
+      padding:2.2rem 1rem;
+      text-align:center;
+      box-shadow: 0 6px 18px rgba(9,10,15,0.12);
+    }
+    header h1{margin:.2rem 0; font-size:1.6rem; letter-spacing: -0.4px}
+    header p{margin:.25rem 0 .6rem; color: #bcd; font-size:0.95rem}
+    .container{
+      max-width: var(--maxw);
+      margin: 1.5rem auto;
+      padding: 1rem;
+    }
+    .card{
+      background:var(--card);
+      border-radius:12px;
+      padding:1.6rem;
+      box-shadow: 0 6px 18px rgba(12,15,20,0.06);
+      margin-bottom:1.25rem;
+    }
+    nav.breadcrumb{
+      display:flex;
+      gap:.5rem;
+      align-items:center;
+      color:var(--muted);
+      font-size:0.95rem;
+      margin-bottom:0.75rem;
+    }
+    nav.breadcrumb a{color:var(--primary); text-decoration:none}
+    .meta{font-size:0.9rem; color:var(--muted); margin-bottom:1rem}
+    h2{color:#083344; margin-top:1rem}
+    h3{color:#0b3b3b; margin-top:1rem}
+    table.stat{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:.6rem;
+    }
+    table.stat th, table.stat td{
+      padding:.55rem .6rem;
+      border:1px solid #e6eef0;
+      text-align:left;
+      vertical-align:top;
+    }
+    table.stat th{background:#f1f8f8; font-weight:600}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:1rem;
+    }
+    @media(min-width:900px){ .grid{grid-template-columns: 2fr 1fr} }
+    pre, code{font-family: var(--mono); font-size:0.92rem}
+    .kbd{background:#eef2f2; padding:.15rem .4rem; border-radius:6px; border:1px solid #e8eef0}
+    .example{
+      background: linear-gradient(180deg, #ffffff 0%, #fbffff 100%);
+      padding:.9rem; border-radius:8px; border:1px solid #e6eef0; margin-top:.6rem;
+    }
+    .cta{
+      display:inline-block; padding:.5rem .8rem; border-radius:8px; background:var(--primary); color:white; text-decoration:none; margin-top:0.6rem;
+    }
+    footer{padding:1rem; text-align:center; color:var(--muted); font-size:0.9rem; margin-top:1rem}
+    /* interactive form */
+    fieldset{border:1px dashed #e6eef0; padding:1rem; border-radius:8px}
+    label{display:block; margin: .45rem 0 .15rem; font-weight:600; color:#044b4b}
+    input[type="text"], textarea{
+      width:100%; padding:.5rem .6rem; border-radius:8px; border:1px solid #dfe9ea; font-size:0.95rem;
+      box-sizing:border-box; resize:vertical;
+    }
+    button{background:#0f766e; color:white; padding:.55rem .9rem; border-radius:8px; border:0; cursor:pointer}
+    small.muted{color:var(--muted)}
+    ul.clean{padding-left:1rem}
+    .toc{background:#fbfeff; padding:.7rem; border-radius:10px; border:1px solid #e6f5f4}
+    .badge{display:inline-block; background:#f1f8f8; color:#0b5560; padding:.2rem .45rem; border-radius:999px; font-size:.82rem; margin-right:.4rem}
+    .code-block{background:#0b1720; color:#dff6f5; padding:.9rem; border-radius:8px; overflow:auto}
+    .download-note{font-size:0.92rem; color:var(--muted)}
+  </style>
+
+  <!-- MathJax for math rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+<body>
+
+<header>
+  <h1>Cybersecurity Statistics Blog</h1>
+  <p><strong>Homework 5 — Measures of Location & Dispersion</strong> · November 4, 2025 · Shefik Memedi</p>
+</header>
+
+<main class="container">
+  <nav class="breadcrumb">
+    <a href="index.html">Home</a> <span>›</span>
+    <a href="homework5.html">Homework 5</a> <span>›</span>
+    <span style="color:var(--muted)">Research & Practical Guide</span>
+  </nav>
+
+  <section class="card grid">
+    <article>
+      <h2>Overview</h2>
+      <p class="meta">
+        Measures of <strong>location</strong> (central tendency) and <strong>dispersion</strong> (spread) are the first step in any statistical analysis.
+        This homework collects common measures, explains how and when to use each, and shows examples tailored to cybersecurity applications.
+      </p>
+
+      <h3>What you will find on this page</h3>
+      <ul class="clean">
+        <li>A compact reference table of common location & dispersion measures</li>
+        <li>Uses, strengths, and limitations of each measure</li>
+        <li>Worked example with a small dataset</li>
+        <li>Interactive calculator (paste CSV / numbers)</li>
+        <li>Notes for teachers / grader about why choices are defensible</li>
+      </ul>
+
+      <h2 id="location">Measures of Location (Central Tendency)</h2>
+      <p>Location measures answer: <em>where</em> are data centred? Different definitions suit different data and goals.</p>
+
+      <table class="stat" aria-describedby="loc-desc">
+        <thead>
+          <tr><th>Measure</th><th>Definition / Formula</th><th>Typical Use</th><th>Pros / Cons</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Arithmetic mean</strong></td>
+            <td><code>\(\bar{x} = \dfrac{1}{n}\sum_{i=1}^n x_i\)</code></td>
+            <td>Continuous numerical data, parametric tests</td>
+            <td>Efficient estimator under Gaussian assumptions; sensitive to outliers and skew.</td>
+          </tr>
+          <tr>
+            <td><strong>Median</strong></td>
+            <td>Middle value after sorting (or average of two middle values)</td>
+            <td>Skewed data, robust summary (e.g., response times)</td>
+            <td>Robust to extreme values; ignores magnitude of tails.</td>
+          </tr>
+          <tr>
+            <td><strong>Mode</strong></td>
+            <td>Most frequent value(s)</td>
+            <td>Categorical data; multi-modal distributions</td>
+            <td>Useful for popularity; may be non-unique or unstable in small samples.</td>
+          </tr>
+          <tr>
+            <td><strong>Geometric mean</strong></td>
+            <td><code>\(\left(\prod_{i=1}^n x_i\right)^{1/n}\)</code> (requires \(x_i>0\))</td>
+            <td>Multiplicative growth rates (ratios, rates)</td>
+            <td>Appropriate for proportions and growth; undefined for non-positive values.</td>
+          </tr>
+          <tr>
+            <td><strong>Harmonic mean</strong></td>
+            <td><code>\(H = \dfrac{n}{\sum_{i=1}^n 1/x_i}\)</code></td>
+            <td>Averaging rates (e.g., speeds, rates per unit)</td>
+            <td>Downweights large values; dominated by small values.</td>
+          </tr>
+          <tr>
+            <td><strong>Trimmed mean</strong></td>
+            <td>Mean after removing smallest &amp; largest \(k\%\)</td>
+            <td>Data with mild outliers</td>
+            <td>Balances sensitivity and robustness via trimming proportion.</td>
+          </tr>
+          <tr>
+            <td><strong>Weighted mean</strong></td>
+            <td><code>\(\bar{x}_w = \dfrac{\sum w_i x_i}{\sum w_i}\)</code></td>
+            <td>Different row/importances (e.g., sample weights)</td>
+            <td>Accounts for heterogenous importance; choose weights carefully.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="dispersion">Measures of Dispersion (Spread)</h2>
+      <p>Dispersion measures answer: <em>how consistent</em> are the data around the center?</p>
+
+      <table class="stat" aria-describedby="disp-desc">
+        <thead>
+          <tr><th>Measure</th><th>Definition / Formula</th><th>Typical Use</th><th>Pros / Cons</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Range</strong></td>
+            <td><code>\(\max(x)-\min(x)\)</code></td>
+            <td>Quick, simple</td>
+            <td>Extremely sensitive to a single outlier.</td>
+          </tr>
+          <tr>
+            <td><strong>Interquartile Range (IQR)</strong></td>
+            <td><code>\(\mathrm{IQR} = Q_3 - Q_1\)</code></td>
+            <td>Skewed distributions; robust spread</td>
+            <td>Focuses on middle 50%; ignores tails.</td>
+          </tr>
+          <tr>
+            <td><strong>Variance</strong></td>
+            <td><code>\(s^2 = \dfrac{1}{n-1}\sum_{i=1}^n (x_i - \bar{x})^2\)</code></td>
+            <td>Foundational for many models (ANOVA, regression)</td>
+            <td>Squares deviations (sensitive to outliers); units are squared.</td>
+          </tr>
+          <tr>
+            <td><strong>Standard deviation</strong></td>
+            <td><code>\(s = \sqrt{s^2}\)</code></td>
+            <td>Same units as data; interpretable dispersion</td>
+            <td>Same sensitivity as variance; easily comparable to mean.</td>
+          </tr>
+          <tr>
+            <td><strong>Mean Absolute Deviation (MAD)</strong></td>
+            <td><code>\(\dfrac{1}{n}\sum |x_i - m|\)</code> (m often median)</td>
+            <td>Robust alternative to variance</td>
+            <td>Less algebraically convenient but more robust to outliers.</td>
+          </tr>
+          <tr>
+            <td><strong>Coefficient of variation (CV)</strong></td>
+            <td><code>\(\mathrm{CV} = \dfrac{s}{\bar{x}}\)</code></td>
+            <td>Compare variability across different scales</td>
+            <td>Requires meaningful non-zero mean; dimensionless.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="uses">Uses — When to pick which measure</h2>
+      <p>Choose measures based on data type, distribution shape, and purpose:</p>
+      <ul>
+        <li><strong>Symmetric, well-behaved numeric data:</strong> arithmetic mean and standard deviation — efficient, mathematically convenient.</li>
+        <li><strong>Skewed or heavy-tailed data:</strong> median and IQR offer robust summaries less affected by rare extremes.</li>
+        <li><strong>Rates / multiplicative processes:</strong> geometric or harmonic mean (e.g., throughput, growth).</li>
+        <li><strong>Categorical / discrete mode:</strong> use mode or barplots to show frequency peaks.</li>
+      </ul>
+
+      <h3 id="cyberapp">Examples in cybersecurity</h3>
+      <p>
+        A few applied examples where the choice matters:
+      </p>
+      <ul>
+        <li>Network <strong>latency</strong>: median latency often better than mean because occasional routing spikes distort averages.</li>
+        <li>Failed <strong>login attempts</strong>: distribution may be heavy-tailed (bot bursts); use median + IQR or count-based summary for alerts.</li>
+        <li>Packet sizes for anomaly detection: variance and standard deviation are commonly used, but MAD helps when outliers are maliciously injected.</li>
+      </ul>
+
+      <h2 id="advantages">Advantages &amp; Limitations — concise checklist</h2>
+      <p>Quickly justify metric choices in a lab write-up or assignment rubric:</p>
+      <ul>
+        <li><strong>Arithmetic mean:</strong> best for Gaussian-like data and when using algebraic methods (variance decomposition). Poor when outliers present.</li>
+        <li><strong>Median / IQR:</strong> robust; ideal for skewed data or when reporting typical behavior.</li>
+        <li><strong>Variance/SD:</strong> central to statistical inference; but report units and consider squared units issue for variance.</li>
+        <li><strong>MAD / trimmed mean:</strong> good compromise between informativeness and robustness.</li>
+      </ul>
+
+      <h2 id="worked">Worked example (small dataset)</h2>
+      <p class="example">
+        Suppose we have observed response times (ms) from a monitoring probe in one hour:
+        <strong>12, 15, 13, 200, 14, 16, 13</strong> — notice the 200 ms spike.
+      </p>
+
+      <p>Compute common measures:</p>
+      <ol>
+        <li>Mean: \( \bar{x} = \dfrac{12+15+13+200+14+16+13}{7} = \dfrac{283}{7} \approx 40.43\ \text{ms}\)</li>
+        <li>Median: sorted data \(12,13,13,14,15,16,200\) → median = 14 ms</li>
+        <li>Range = 200 − 12 = 188 ms</li>
+        <li>IQR: Q1 ≈ 13, Q3 ≈ 16 → IQR ≈ 3 ms</li>
+        <li>Sample variance (brief): subtracting mean inflates by the 200 spike — therefore SD will be large and misleading here.</li>
+      </ol>
+
+      <p><strong>Interpretation:</strong> mean = 40.4 ms is pulled up by a single spike; median = 14 ms better represents general user experience. For reporting SLA, median &amp; IQR are stronger choices.</p>
+
+      <h2 id="interactive">Interactive calculator — paste numbers or CSV</h2>
+      <p class="muted">Paste numbers separated by commas, spaces, or new lines. Non-numeric tokens are ignored.</p>
+      <fieldset>
+        <label for="data">Data (CSV / whitespace separated)</label>
+        <textarea id="data" rows="4" placeholder="e.g. 12,15,13,200,14,16,13"></textarea>
+        <div style="display:flex; gap:.6rem; margin-top:.6rem; align-items:center;">
+          <button id="compute">Compute measures</button>
+          <button id="exampleBtn" type="button">Load example dataset</button>
+          <div style="margin-left:auto">
+            <small class="muted">Click <span class="kbd">Compute</span> to run</small>
+          </div>
+        </div>
+      </fieldset>
+
+      <div id="results" style="margin-top:1rem;"></div>
+
+      <h3 id="notes">Notes for graders / instructors</h3>
+      <p>
+        When grading, accept justification based on distributional shape. If students choose median/IQR over mean/SD, expect explicit explanation that the data are skewed or contain outliers. Encourage mention of sample size and measurement units (especially for CV).
+      </p>
+
+      <h2 id="references">Suggested references & further reading</h2>
+      <ul>
+        <li>Any basic statistics textbook for formal definitions (e.g., Mood, Graybill &amp; Boes).</li>
+        <li>Numerical analysis notes on floating point effects — good to consult before writing algorithms.</li>
+        <li>Applied articles on metrics selection in operational monitoring (median &amp; p99 reporting).</li>
+      </ul>
+
+    </article>
+
+    <aside class="card">
+      <div class="toc">
+        <div style="display:flex; align-items:center; gap:.5rem; margin-bottom:.5rem">
+          <span class="badge">HMWK 5</span><strong>Quick links</strong>
+        </div>
+        <ol style="margin-left:0.5rem;">
+          <li><a href="#location">Measures of Location</a></li>
+          <li><a href="#dispersion">Measures of Dispersion</a></li>
+          <li><a href="#uses">When to use each</a></li>
+          <li><a href="#worked">Worked example</a></li>
+          <li><a href="#interactive">Interactive calculator</a></li>
+          <li><a href="#notes">Notes for graders</a></li>
+        </ol>
+      </div>
+
+      <div style="margin-top:1rem">
+        <h3>Deliverables checklist</h3>
+        <ul>
+          <li>Research description of measures — done</li>
+          <li>Uses, advantages &amp; limitations — done</li>
+          <li>Worked example — included</li>
+          <li>Separate page link for Excel sheet — <em>this file</em> (homework5.html)</li>
+          <li>Ready for marking — concise interpretation section included</li>
+        </ul>
+      </div>
+
+      <div style="margin-top:1rem">
+        <h3>Homework 6 (preview)</h3>
+        <p class="muted">Next: proofs of recurrence relationships and implementation of online mean &amp; variance (Welford, Youngs &amp; C). Will be published as <code>homework6.html</code>.</p>
+        <a class="cta" href="homework6.html">Prepare Homework 6</a>
+      </div>
+
+    </aside>
+  </section>
+
+  <section class="card">
+    <h2>Implementation: client-side calculator (what it computes)</h2>
+    <p>When run, the calculator computes:</p>
+    <ul>
+      <li>Count, min, max, range</li>
+      <li>Arithmetic mean (sample mean)</li>
+      <li>Median, mode(s)</li>
+      <li>Sample variance (Bessel's correction), sample standard deviation</li>
+      <li>Interquartile range (IQR)</li>
+      <li>Mean Absolute Deviation (MAD) around median or mean</li>
+      <li>Coefficient of Variation (CV) when mean ≠ 0</li>
+    </ul>
+
+    <div class="code-block" style="margin-top:.6rem;">
+<pre id="js-code" style="white-space:pre-wrap;">
+// The calculator runs in the page's JS available below.
+// It parses user input, computes metrics, and displays results.
+// Implementation is purposely straightforward and numerically stable for small/medium arrays.
+</pre>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Appendix: pedagogical explanation (short)</h2>
+    <p>
+      A short teaching paragraph you can paste into your assignment submission:
+    </p>
+    <blockquote style="border-left:4px solid #e6f4f3; padding: .6rem; background:#fbffff">
+      Measures of location (mean, median, mode) summarize where values cluster; measures of dispersion (variance, SD, IQR) describe how far values deviate from that center.
+      For skewed or heavy-tailed data, median and IQR are recommended because they are robust to extreme values. For symmetric, light-tailed data, mean and SD are efficient and integrate naturally with parametric inference.
+    </blockquote>
+    <p class="download-note">When you freeze this column in your Excel sheet, use the permanent link: <code>https://shefikmemedi.github.io/homework5.html</code></p>
+  </section>
+
+  <footer class="card" style="text-align:center">
+    <p style="margin:0"><strong>Author:</strong> Shefik Memedi &middot; MSc Cybersecurity — Sapienza</p>
+    <p style="margin:.35rem 0 0; color:var(--muted)">Published on GitHub Pages · <a href="https://github.com/shefikmemedi/shefikmemedi.github.io" target="_blank">Repository</a></p>
+  </footer>
+</main>
+
+<!-- ------- Interactive JS (calculator) ------- -->
+<script>
+(function(){
+  // Utility functions
+  function parseInput(text){
+    if(!text) return [];
+    // split by commas, semicolons, whitespace
+    const tokens = text.split(/[,;\\n\\s]+/).map(t=>t.trim()).filter(Boolean);
+    const nums = tokens.map(t => {
+      // allow numbers with comma decimal? no, assume dot decimal
+      const v = Number(t);
+      return Number.isFinite(v) ? v : NaN;
+    }).filter(v => !Number.isNaN(v));
+    return nums;
+  }
+
+  function mean(arr){
+    if(arr.length===0) return NaN;
+    let s = 0;
+    for (let v of arr) s += v;
+    return s/arr.length;
+  }
+
+  function median(arr){
+    if(arr.length===0) return NaN;
+    const a = [...arr].sort((x,y)=>x-y);
+    const n = a.length;
+    if(n%2===1) return a[(n-1)/2];
+    return (a[n/2 - 1] + a[n/2]) / 2;
+  }
+
+  function mode(arr){
+    const m = new Map();
+    for (let v of arr) m.set(v,(m.get(v)||0)+1);
+    let maxc = 0;
+    for (let c of m.values()) if(c>maxc) maxc=c;
+    const modes = [...m.entries()].filter(([v,c]) => c===maxc).map(([v,c])=>v);
+    // If every value appears once, return empty (no meaningful mode)
+    if(maxc===1) return [];
+    return modes;
+  }
+
+  function variance_sample(arr){
+    const n = arr.length;
+    if(n < 2) return NaN;
+    const mu = mean(arr);
+    let s = 0;
+    for (let v of arr){ const d = v - mu; s += d*d; }
+    return s / (n - 1); // sample variance
+  }
+
+  function sd_sample(arr){
+    const v = variance_sample(arr);
+    return Number.isNaN(v) ? NaN : Math.sqrt(v);
+  }
+
+  function iqr(arr){
+    if(arr.length===0) return NaN;
+    const a = [...arr].sort((x,y)=>x-y);
+    const q1 = quantile(a,0.25);
+    const q3 = quantile(a,0.75);
+    return q3 - q1;
+  }
+
+  function quantile(sortedArr, q){
+    // linear interpolation method
+    const n = sortedArr.length;
+    if(n===0) return NaN;
+    const pos = (n - 1) * q;
+    const lower = Math.floor(pos);
+    const upper = Math.ceil(pos);
+    if(lower === upper) return sortedArr[lower];
+    const weight = pos - lower;
+    return sortedArr[lower]*(1-weight) + sortedArr[upper]*weight;
+  }
+
+  function mad(arr, centerFunc = median){
+    if(arr.length===0) return NaN;
+    const c = centerFunc(arr);
+    const devs = arr.map(x => Math.abs(x - c));
+    return mean(devs);
+  }
+
+  // UI bindings
+  const dataEl = document.getElementById('data');
+  const btn = document.getElementById('compute');
+  const exampleBtn = document.getElementById('exampleBtn');
+  const results = document.getElementById('results');
+
+  exampleBtn.addEventListener('click', ()=> {
+    dataEl.value = '12, 15, 13, 200, 14, 16, 13';
+  });
+
+  btn.addEventListener('click', ()=> {
+    const arr = parseInput(dataEl.value);
+    if(arr.length===0){
+      results.innerHTML = '<p style="color:#b02a2a">Please paste or type numeric values first.</p>';
+      return;
+    }
+
+    // Basic stats
+    const n = arr.length;
+    const min = Math.min(...arr);
+    const max = Math.max(...arr);
+    const rng = max - min;
+    const mu = mean(arr);
+    const med = median(arr);
+    const modes = mode(arr);
+    const s2 = variance_sample(arr);
+    const s = sd_sample(arr);
+    const myiqr = iqr(arr);
+    const mad_median = mad(arr, median);
+    const mad_mean = mad(arr, mean);
+    const cv = (mu === 0) ? NaN : (s / Math.abs(mu));
+
+    // Build HTML
+    let html = '<h3>Results</h3>';
+    html += '<table class="stat" style="margin-top:.6rem">';
+    html += '<tr><th>Measure</th><th>Value</th></tr>';
+    html += `<tr><td>Count (n)</td><td>${n}</td></tr>`;
+    html += `<tr><td>Min</td><td>${min}</td></tr>`;
+    html += `<tr><td>Max</td><td>${max}</td></tr>`;
+    html += `<tr><td>Range</td><td>${rng}</td></tr>`;
+    html += `<tr><td>Mean (arithmetic)</td><td>${isNaN(mu) ? '—' : mu.toFixed(6)}</td></tr>`;
+    html += `<tr><td>Median</td><td>${isNaN(med) ? '—' : med}</td></tr>`;
+    html += `<tr><td>Mode(s)</td><td>${modes.length===0 ? 'No mode (all unique)' : modes.join(', ')}</td></tr>`;
+    html += `<tr><td>Sample variance (s²)</td><td>${isNaN(s2) ? '—' : s2.toFixed(6)}</td></tr>`;
+    html += `<tr><td>Sample standard deviation (s)</td><td>${isNaN(s) ? '—' : s.toFixed(6)}</td></tr>`;
+    html += `<tr><td>IQR</td><td>${isNaN(myiqr) ? '—' : myiqr.toFixed(6)}</td></tr>`;
+    html += `<tr><td>MAD (around median)</td><td>${isNaN(mad_median) ? '—' : mad_median.toFixed(6)}</td></tr>`;
+    html += `<tr><td>MAD (around mean)</td><td>${isNaN(mad_mean) ? '—' : mad_mean.toFixed(6)}</td></tr>`;
+    html += `<tr><td>Coefficient of Variation (CV)</td><td>${isNaN(cv) ? '—' : cv.toFixed(6)}</td></tr>`;
+    html += '</table>';
+
+    // Short interpretation heuristics
+    html += '<div style="margin-top:.8rem"><strong>Quick interpretation:</strong> ';
+    if(s > mu*2) html += '<span style="color:#b45309">High dispersion relative to mean — data unstable; consider reporting median &amp; IQR.</span>';
+    else html += '<span style="color:#065f46">Dispersion is moderate; mean and standard deviation are informative.</span>';
+    html += '</div>';
+
+    results.innerHTML = html;
+  });
+
+  // Preload with example
+  dataEl.value = '12, 15, 13, 200, 14, 16, 13';
+  // Optionally compute automatically:
+  // btn.click();
+})();
+</script>
+
+</body>
+</html>
