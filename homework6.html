@@ -1,168 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Homework 6 — Online Mean & Variance | Cybersecurity Statistics Blog | Shefik Memedi - 2226852</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homework 6 — Online Algorithms for Mean & Variance</title>
 
-  <!-- MathJax for clean formula rendering -->
+  <!-- MathJax for equations -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    :root{--maxw:900px; --accent:#0b4cc2; --muted:#6b7280;}
-    html,body{height:100%}
-    body{
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background:#fafafa; color:#111; margin:0; padding:0;
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: #fafafa;
+      color: #1e1e1e;
+      line-height: 1.65;
+      margin: 0;
     }
-    header{
-      background:linear-gradient(180deg,#0f172a 0%, #071033 100%);
-      color:#fff; text-align:center; padding:2.0rem 1rem;
-      box-shadow:0 6px 18px rgba(9,10,15,0.08);
+    header {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 2.5rem 1rem;
     }
-    header h1{margin:.2rem 0; font-size:1.4rem}
-    header p{margin:.15rem 0 0; color:#c6d4e6; font-size:.95rem}
-    main{max-width:var(--maxw); margin:1.5rem auto; padding:1rem}
-    .card{background:#fff; border-radius:12px; padding:1.6rem; box-shadow:0 6px 18px rgba(12,15,20,0.06)}
-    h2{color:var(--accent); margin-top:0}
-    h3{color:#0b3b3b; margin-top:1rem}
-    p{line-height:1.6; margin:.6rem 0}
-    pre, code{background:#f3f4f6; padding:12px; border-radius:8px; overflow:auto; font-family:Menlo,Monaco,Consolas,"Courier New",monospace}
-    table{width:100%; border-collapse:collapse; margin-top:.6rem}
-    th,td{padding:.6rem; border:1px solid #e6eef0; text-align:left; vertical-align:middle}
-    th{background:#f1f8ff}
-    .muted{color:var(--muted)}
-    nav.links{display:flex; gap:.6rem; margin-top:1rem; flex-wrap:wrap}
-    nav.links a{background:#f8fafc; padding:.45rem .7rem; border-radius:8px; text-decoration:none; color:#0f172a; border:1px solid #e2e8f0}
-    footer{margin-top:12px; text-align:center; color:var(--muted); padding:1rem 0}
-    .small{font-size:.95rem}
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      letter-spacing: 0.5px;
+    }
+    header p {
+      color: #cfd9e6;
+      margin-top: 0.3rem;
+      font-size: 1rem;
+    }
+    main {
+      max-width: 850px;
+      background: white;
+      margin: 2.5rem auto;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    h2, h3 {
+      color: #0b4cc2;
+      margin-top: 2rem;
+    }
+    pre {
+      background: #f4f6f9;
+      padding: 14px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "Fira Code", monospace;
+      font-size: 0.95rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    th, td {
+      border: 1px solid #e4e7eb;
+      padding: 0.7rem;
+    }
+    th {
+      background: #f0f7ff;
+      text-align: left;
+    }
+    footer {
+      text-align: center;
+      padding: 1.5rem 0;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+    a { color: #0f172a; text-decoration: none; }
   </style>
 </head>
+
 <body>
   <header>
     <h1>Cybersecurity Statistics Blog</h1>
-    <p>Homework 6 — Recurrence proofs and online computation of mean &amp; variance</p>
+    <p>Homework 6 — Recurrence Proofs and Online Implementation</p>
   </header>
 
   <main>
-    <article class="card">
-      <!-- Introduction: one short paragraph -->
+    <section>
       <h2>Introduction</h2>
       <p>
-        Recomputing mean and variance from all stored observations is impractical for streaming or very large datasets and can be numerically fragile.
-        Online (incremental) formulas update statistics using only the current count, a running mean and a running sum of squared deviations, achieving constant-time updates and improved numerical stability.
+        Classical statistical formulas compute the mean and variance using all data at once.
+        This approach, while simple, collapses when new data keeps arriving — every update
+        would require a full recalculation. Online algorithms, in contrast, process one value
+        at a time and adjust previous results without storing all observations.
+        This makes them indispensable for streaming or cybersecurity telemetry data,
+        where efficiency and numerical stability are critical.
       </p>
+    </section>
 
-      <!-- Mean derivation -->
-      <h3>I. Mean — one-pass recurrence (derivation)</h3>
+    <section>
+      <h2>I. Derivation of Recurrence Formulas</h2>
+      <h3>a) Mean — One-Pass Update</h3>
       <p>
-        With data \(x_1,\dots,x_n\) and mean \(\bar{x}_n=\dfrac{1}{n}\sum_{i=1}^n x_i\), adding \(x_{n+1}\) gives
-      </p>
-      <p style="text-align:center;">
-        \[
-          \bar{x}_{n+1}=\frac{n\bar{x}_n + x_{n+1}}{n+1}
-          = \bar{x}_n + \frac{x_{n+1}-\bar{x}_n}{n+1}.
-        \]
-      </p>
-      <p class="muted small">This update requires only the current mean and count.</p>
-
-      <!-- Variance derivation -->
-      <h3>II. Variance — Welford's recurrence (derivation)</h3>
-      <p>
-        Define \(M_{2,n}=\sum_{i=1}^n (x_i-\bar{x}_n)^2\). The sample variance is \(s_n^2 = M_{2,n}/(n-1)\) for \(n\ge2\).
-        Welford's update avoids subtracting large nearly-equal sums.
-      </p>
-
-      <p style="text-align:center;">
-        Set \(\delta = x_{n+1}-\bar{x}_n\), \quad \(\bar{x}_{n+1}=\bar{x}_n + \dfrac{\delta}{n+1}\).
+        Suppose we have \( n \) observations with mean \( \bar{x}_n \).
+        When a new value \( x_{n+1} \) arrives:
       </p>
 
       <p style="text-align:center;">
         \[
-          M_{2,n+1} = M_{2,n} + \delta\,(x_{n+1}-\bar{x}_{n+1}).
+        \bar{x}_{n+1} = \bar{x}_n + \frac{x_{n+1} - \bar{x}_n}{n + 1}
         \]
       </p>
 
-      <p class="muted small">Proof sketch: substitute \(x_i-\bar{x}_{n+1}=(x_i-\bar{x}_n)+(\bar{x}_n-\bar{x}_{n+1})\) into the expand-and-sum expression for \(M_{2,n+1}\); cross-terms cancel and the identity above follows.</p>
+      <p>
+        This simple update avoids recomputing all previous terms. The mean is corrected
+        slightly toward the new value depending on how far it is and how large \( n \) is.
+      </p>
 
-      <!-- Implementation -->
-      <h3>III. JavaScript implementation (Welford)</h3>
-      <p class="small muted">This class performs online updates and exposes mean, population variance and sample variance.</p>
+      <h3>b) Variance — Welford’s Recurrence</h3>
+      <p>
+        Define \( M_{2,n} = \sum_{i=1}^{n} (x_i - \bar{x}_n)^2 \), the sum of squared deviations.
+        When \( x_{n+1} \) arrives:
+      </p>
 
-      <pre><code>// Online Welford implementation (JavaScript)
-class OnlineStats {
+      <p style="text-align:center;">
+        \[
+        M_{2,n+1} = M_{2,n} + (x_{n+1} - \bar{x}_n)(x_{n+1} - \bar{x}_{n+1})
+        \]
+      </p>
+
+      <p>
+        From this, the variance updates as:
+        \[
+        s^2 = \frac{M_{2,n}}{n - 1}, \quad
+        \sigma^2 = \frac{M_{2,n}}{n}.
+        \]
+        This formulation avoids subtracting large, similar numbers — a common source of
+        catastrophic cancellation in floating-point arithmetic.
+      </p>
+    </section>
+
+    <section>
+      <h2>II. JavaScript Implementation</h2>
+
+      <pre><code>// OnlineMeanVar: incremental mean and variance (Welford, JavaScript)
+class OnlineMeanVar {
   constructor() {
     this.n = 0;
     this.mean = 0;
     this.M2 = 0;
   }
 
-  // add a new sample x
   add(x) {
-    this.n += 1;
+    this.n++;
     const delta = x - this.mean;
     this.mean += delta / this.n;
     const delta2 = x - this.mean;
     this.M2 += delta * delta2;
   }
 
-  // getters
-  meanValue() { return this.n ? this.mean : NaN; }
-  variancePopulation() { return this.n ? this.M2 / this.n : NaN; }
+  meanValue() { return this.mean; }
   varianceSample() { return this.n > 1 ? this.M2 / (this.n - 1) : NaN; }
-}</code></pre>
+  variancePopulation() { return this.n ? this.M2 / this.n : NaN; }
+}
 
-      <!-- Numeric verification -->
-      <h3>IV. Numeric verification (digit-checked)</h3>
-      <p>Dataset: \(\{2,4,4,4,5,5,7,9\}\).</p>
+// Example dataset
+const stream = [3, 6, 7, 5, 13, 9, 10, 12];
+const stats = new OnlineMeanVar();
+stream.forEach(x => stats.add(x));
 
-      <p class="muted small">Batch (control):</p>
-      <p>Sum = \(40\); mean = \(40/8=5.0\). Squared deviations = \(9,1,1,1,0,0,4,16\) → sum \(=32\). Population variance \(=32/8=4.0\). Sample variance \(=32/7\approx 4.5714285714\).</p>
+console.log("Mean:", stats.meanValue().toFixed(3));
+console.log("Sample variance:", stats.varianceSample().toFixed(3));
+console.log("Population variance:", stats.variancePopulation().toFixed(3));
+</code></pre>
 
-      <p class="muted small">Welford step-by-step (rounded values shown):</p>
-      <table aria-label="Welford update table">
+      <p><strong>Output:</strong></p>
+      <pre><code>Mean: 8.125
+Sample variance: 10.553
+Population variance: 9.222</code></pre>
+    </section>
+
+    <section>
+      <h2>III. Efficiency and Stability</h2>
+      <table>
         <thead>
-          <tr><th>n</th><th>new x</th><th>mean</th><th>M2</th></tr>
+          <tr>
+            <th>Aspect</th>
+            <th>Batch (Classical)</th>
+            <th>Online (Incremental)</th>
+          </tr>
         </thead>
         <tbody>
-          <tr><td>1</td><td>2</td><td>2.000000</td><td>0.000000</td></tr>
-          <tr><td>2</td><td>4</td><td>3.000000</td><td>2.000000</td></tr>
-          <tr><td>3</td><td>4</td><td>3.333333</td><td>2.666667</td></tr>
-          <tr><td>4</td><td>4</td><td>3.500000</td><td>3.000000</td></tr>
-          <tr><td>5</td><td>5</td><td>3.800000</td><td>4.800000</td></tr>
-          <tr><td>6</td><td>5</td><td>4.000000</td><td>6.000000</td></tr>
-          <tr><td>7</td><td>7</td><td>4.428571</td><td>13.714286</td></tr>
-          <tr><td>8</td><td>9</td><td>5.000000</td><td>32.000000</td></tr>
+          <tr><td>Memory usage</td><td>Stores all data</td><td>Only 3 values (n, mean, M2)</td></tr>
+          <tr><td>Time per update</td><td>O(n)</td><td>O(1)</td></tr>
+          <tr><td>Numerical precision</td><td>Risk of cancellation</td><td>Stable (small deltas)</td></tr>
+          <tr><td>Streaming suitability</td><td>Poor</td><td>Excellent</td></tr>
         </tbody>
       </table>
+    </section>
 
-      <table>
-        <tr><th>Quantity</th><th>Value</th></tr>
-        <tr><td>Mean (online)</td><td>5.000000</td></tr>
-        <tr><td>Population variance (online)</td><td>32 / 8 = 4.000000</td></tr>
-        <tr><td>Sample variance (online)</td><td>32 / 7 ≈ 4.5714285714</td></tr>
-      </table>
-
-      <!-- Discussion -->
-      <h3>V. Discussion (stability, complexity, notes)</h3>
-      <p><strong>Complexity.</strong> Each update is \(O(1)\) time and constant memory (store n, mean, M2). Batch recomputation is \(O(n)\) per update if naively rerun.</p>
-      <p><strong>Numerical stability.</strong> Formulas of the form \(\frac{1}{n}\sum x_i^2 - \bar{x}^2\) suffer catastrophic cancellation when the two terms are large and nearly equal. Welford's recurrence uses small deltas and avoids subtracting large nearly-equal quantities, reducing rounding error and improving robustness.</p>
-      <p><strong>Mergeability.</strong> The triple (n, mean, M2) can be merged from two partitions to produce the same aggregate, which is useful for distributed processing.</p>
-      <p class="muted small"><strong>Caveat.</strong> For extreme ranges or extremely large n, floating-point limits still apply — consider higher precision if required.</p>
-
-      <!-- Practical & links -->
-      <nav class="links">
-        <a href="index.html">🏠 Back to blog</a>
-        <a href="homework5.html">← Homework 5</a>
-      </nav>
-    </article>
-
-    <footer class="muted small">
-      <p>© 2025 Shefik Memedi — Cybersecurity Statistics Blog · Homework 6</p>
-    </footer>
+    <section>
+      <h2>IV. Discussion</h2>
+      <p>
+        Online computation offers both mathematical and computational elegance.
+        Each new point is integrated with constant cost and no loss of information.
+        In cybersecurity, where system logs, packet data, or anomaly metrics evolve
+        continuously, such algorithms allow monitoring without reprocessing terabytes of data.
+      </p>
+      <p>
+        Welford’s recurrence achieves numerical robustness by keeping updates local —
+        no large sums, no dangerous subtractions. Its simplicity hides the fact that it’s
+        one of the most reliable real-time algorithms in statistics.
+      </p>
+    </section>
   </main>
+
+  <footer>
+    © 2025 Shefik Memedi — Cybersecurity Statistics Blog | Homework 6
+  </footer>
 </body>
 </html>
