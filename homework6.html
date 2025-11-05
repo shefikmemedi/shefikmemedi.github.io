@@ -1,47 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Homework 6 — Online Mean & Variance | Cybersecurity Statistics Blog</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homework 6 – Online Algorithms for Mean and Variance | Cybersecurity Statistics Blog</title>
   <style>
     body {
-      font-family: "Segoe UI", Roboto, sans-serif;
-      background: #f8fafc;
-      color: #111827;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      background: #fafafa;
+      color: #222;
       margin: 0;
       padding: 0;
-      line-height: 1.7;
     }
-    .container {
-      max-width: 850px;
-      margin: 60px auto;
-      background: white;
-      padding: 40px 50px;
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    header {
+      background: #0f172a;
+      color: #fff;
+      text-align: center;
+      padding: 40px 10px;
     }
-    h1, h2, h3 {
-      color: #0f172a;
-    }
-    h1 {
+    header h1 {
+      margin: 0;
       font-size: 2em;
-      margin-bottom: 0.4em;
+    }
+    header p {
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+    main {
+      max-width: 900px;
+      background: #fff;
+      margin: 40px auto;
+      padding: 40px 50px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
     }
     h2 {
-      margin-top: 1.5em;
-      color: #1e293b;
       border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 4px;
+      padding-bottom: 5px;
+      color: #1e293b;
+      margin-top: 1.6em;
     }
-    code, pre {
+    h3 { color: #334155; margin-top: 1.2em; }
+    p { line-height: 1.7; margin-top: 0.8em; }
+    pre, code {
       background: #f1f5f9;
-      border-radius: 8px;
       padding: 10px;
-      font-family: monospace;
-      display: block;
+      border-radius: 8px;
+      font-family: 'Consolas', monospace;
       overflow-x: auto;
     }
+    pre { margin: 1em 0; }
     table {
       width: 100%;
       border-collapse: collapse;
@@ -52,77 +60,110 @@
       padding: 10px;
       text-align: left;
     }
-    th {
-      background: #f9fafb;
-    }
-    .footer {
-      text-align: center;
-      font-size: 0.9em;
-      color: #6b7280;
+    th { background: #f9fafb; }
+    nav {
+      display: flex;
+      justify-content: space-between;
       margin-top: 40px;
     }
+    nav a {
+      color: #0f172a;
+      text-decoration: none;
+      font-weight: 500;
+      border: 1px solid #cbd5e1;
+      padding: 8px 16px;
+      border-radius: 8px;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+    }
+    nav a:hover {
+      background: #0f172a;
+      color: #fff;
+    }
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.9em;
+      margin: 50px 0 30px;
+    }
   </style>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
 </head>
 <body>
-  <div class="container">
-    <h1>Homework 6 — Proof of Recurrence Formulas and Implementation of Online Algorithms</h1>
-    <p><strong>Date:</strong> November 3, 2025</p>
-    <p><strong>Course:</strong> Statistics (Cybersecurity, 2025/26)</p>
+
+  <header>
+    <h1>Cybersecurity Statistics Blog</h1>
+    <p>Homework 6 — Proof of Recurrence Formulas and Online Algorithms</p>
+  </header>
+
+  <main>
+    <p><strong>Date:</strong> November 3, 2025<br>
+       <strong>Course:</strong> Statistics (25/26, Cybersecurity)</p>
 
     <h2>1. Introduction</h2>
     <p>
-      Traditional or “batch” computation of statistics requires all data points in memory, 
-      recalculating the mean and variance whenever new observations are added. 
-      This is computationally expensive and numerically unstable for large or streaming data.
-      Instead, <em>online (incremental) algorithms</em> update statistics in constant time (<code>O(1)</code>), 
-      using only the previous mean and variance.
+      Statistical computations often involve repetitive updates as new data arrive. 
+      Recomputing the mean and variance from all values every time is inefficient, 
+      especially in cybersecurity contexts where data streams are continuous and large. 
+      To overcome this, <em>online (incremental)</em> algorithms update these quantities using 
+      constant memory and \(O(1)\) operations per observation.
     </p>
 
-    <h2>2. Derivation of the Recurrence Formulas</h2>
+    <h2>2. Deriving the Recurrence Formulas</h2>
 
     <h3>2.1 Updating the Mean</h3>
     <p>
-      Let the previous mean after <em>n</em> observations be <code>μₙ</code>, 
-      and the new observation be <code>xₙ₊₁</code>. 
-      The new mean <code>μₙ₊₁</code> can be derived as:
+      Suppose after \(n\) observations, the mean is \(\mu_n\).  
+      When a new value \(x_{n+1}\) arrives, the updated mean becomes:
     </p>
-
-    <pre>
-μₙ₊₁ = μₙ + (xₙ₊₁ − μₙ) / (n + 1)
-    </pre>
-
+    <p style="text-align:center;">
+      \[
+      \mu_{n+1} = \mu_n + \frac{x_{n+1} - \mu_n}{n + 1}
+      \]
+    </p>
     <p>
-      This formula allows us to update the mean incrementally, without summing all values again.
+      This formula incrementally adjusts the mean without summing all data again.
     </p>
 
     <h3>2.2 Updating the Variance</h3>
     <p>
-      Let <code>M₂</code> represent the sum of squared deviations from the current mean:
+      Define \(M_2\) as the running total of squared deviations from the mean:
     </p>
-    <pre>
-M₂ₙ = Σ (xᵢ − μₙ)²
-    </pre>
-    <p>
-      When adding a new observation <code>xₙ₊₁</code>:
+    <p style="text-align:center;">
+      \[
+      M_{2,n} = \sum_{i=1}^{n} (x_i - \mu_n)^2
+      \]
     </p>
-
-    <pre>
-δ = xₙ₊₁ − μₙ
-μₙ₊₁ = μₙ + δ / (n + 1)
-M₂ₙ₊₁ = M₂ₙ + δ * (xₙ₊₁ − μₙ₊₁)
-    </pre>
-
     <p>
-      Then, the <strong>population variance</strong> and <strong>sample variance</strong> are computed as:
+      For the next observation \(x_{n+1}\):
     </p>
-    <pre>
-Population variance:  σ² = M₂ / n
-Sample variance:      s² = M₂ / (n − 1)
-    </pre>
-
+    <p style="text-align:center;">
+      \[
+      \delta = x_{n+1} - \mu_n
+      \]
+      \[
+      \mu_{n+1} = \mu_n + \frac{\delta}{n + 1}
+      \]
+      \[
+      M_{2,n+1} = M_{2,n} + \delta (x_{n+1} - \mu_{n+1})
+      \]
+    </p>
     <p>
-      This elegant recurrence relation, introduced by B. P. Welford (1962), 
-      is both memory-efficient and numerically stable.
+      Then:
+    </p>
+    <p style="text-align:center;">
+      \[
+      \text{Population Variance: } \sigma^2 = \frac{M_2}{n}
+      \quad \text{and} \quad
+      \text{Sample Variance: } s^2 = \frac{M_2}{n - 1}
+      \]
+    </p>
+    <p>
+      These are the core recurrence relations behind <strong>Welford’s algorithm</strong> 
+      (1962), celebrated for its numerical stability and constant memory use.
     </p>
 
     <h2>3. JavaScript Implementation (Welford’s Method)</h2>
@@ -157,9 +198,10 @@ class RunningStats {
   }
 }
 
-// Example usage:
+// Example
 const rs = new RunningStats();
 [2, 4, 4, 4, 5, 5, 7, 9].forEach(x => rs.push(x));
+
 console.log("Mean:", rs.getMean());
 console.log("Sample Variance:", rs.sampleVariance());
 console.log("Population Variance:", rs.populationVariance());
@@ -172,34 +214,42 @@ Sample Variance: 4
 Population Variance: 3.5
     </pre>
 
-    <h2>4. Comparison: Online vs Classical Algorithms</h2>
+    <h2>4. Efficiency Comparison</h2>
 
     <table>
       <tr><th>Aspect</th><th>Classical (Batch)</th><th>Online (Incremental)</th><th>More Efficient</th></tr>
-      <tr><td>Memory</td><td>Stores all values</td><td>Constant (n, mean, M2)</td><td>Online</td></tr>
+      <tr><td>Memory</td><td>Stores all values</td><td>Constant (n, mean, M₂)</td><td>Online</td></tr>
       <tr><td>Time per update</td><td>O(n)</td><td>O(1)</td><td>Online</td></tr>
-      <tr><td>Numerical stability</td><td>Prone to rounding errors</td><td>Stable (Welford’s method)</td><td>Online</td></tr>
-      <tr><td>Data access</td><td>Requires full dataset</td><td>Processes stream once</td><td>Online</td></tr>
+      <tr><td>Numerical stability</td><td>Rounding errors possible</td><td>Stable (Welford’s)</td><td>Online</td></tr>
+      <tr><td>Data access</td><td>Full dataset required</td><td>Streams once</td><td>Online</td></tr>
       <tr><td>Implementation</td><td>Simpler formula</td><td>More logic</td><td>Classical</td></tr>
     </table>
 
     <h2>5. Discussion</h2>
     <p>
-      From a computational perspective, online algorithms provide significant advantages 
-      in data streaming, cybersecurity telemetry, and IoT monitoring contexts — 
-      where data arrives continuously and full recomputation is infeasible.
-      Welford’s method avoids catastrophic cancellation by preventing subtraction of nearly equal large sums,
-      improving numerical robustness and preventing overflow.
+      Online computation has become a backbone of real-time statistical monitoring in cybersecurity — 
+      from network flow analysis to anomaly detection. 
+      The key advantage lies in its stability: it avoids the catastrophic cancellation 
+      that plagues naive variance formulas when large numbers are subtracted. 
+      These incremental algorithms maintain precision even in long-running streams, 
+      where batch recomputation would overflow or lose accuracy.
     </p>
 
     <p>
-      In cybersecurity analytics, such incremental methods are essential for real-time monitoring of network statistics, 
-      anomaly detection, and adaptive baselining of performance metrics.
+      In short, Welford’s method combines <strong>efficiency</strong>, 
+      <strong>stability</strong>, and <strong>scalability</strong> — 
+      essential properties for data-driven cybersecurity systems.
     </p>
 
-    <div class="footer">
-      <p><strong>Cybersecurity Statistics Blog — Shefik Memedi</strong><br>Homework 6 | Academic Year 2025/26</p>
-    </div>
-  </div>
+    <nav>
+      <a href="index.html">← Back to Blog</a>
+      <a href="homework7.html">Next → HW 7</a>
+    </nav>
+  </main>
+
+  <footer>
+    © 2025 Cybersecurity Statistics Blog | Homework 6 by Shefik Memedi
+  </footer>
+
 </body>
 </html>
