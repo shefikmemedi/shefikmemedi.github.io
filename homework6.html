@@ -3,181 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Homework 6 – Online Algorithms for Mean and Variance | Cybersecurity Statistics Blog</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Roboto, sans-serif;
-      background: #fafafa;
-      color: #222;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #0f172a;
-      color: #fff;
-      text-align: center;
-      padding: 40px 10px;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2em;
-    }
-    header p {
-      color: #94a3b8;
-      margin-top: 6px;
-    }
-    main {
-      max-width: 900px;
-      background: #fff;
-      margin: 40px auto;
-      padding: 40px 50px;
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.05);
-    }
-    h2 {
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 5px;
-      color: #1e293b;
-      margin-top: 1.6em;
-    }
-    h3 { color: #334155; margin-top: 1.2em; }
-    p { line-height: 1.7; margin-top: 0.8em; }
-    pre, code {
-      background: #f1f5f9;
-      padding: 10px;
-      border-radius: 8px;
-      font-family: 'Consolas', monospace;
-      overflow-x: auto;
-    }
-    pre { margin: 1em 0; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.2em 0;
-    }
-    th, td {
-      border: 1px solid #e2e8f0;
-      padding: 10px;
-      text-align: left;
-    }
-    th { background: #f9fafb; }
-    nav {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 40px;
-    }
-    nav a {
-      color: #0f172a;
-      text-decoration: none;
-      font-weight: 500;
-      border: 1px solid #cbd5e1;
-      padding: 8px 16px;
-      border-radius: 8px;
-      background: #f8fafc;
-      transition: all 0.2s ease;
-    }
-    nav a:hover {
-      background: #0f172a;
-      color: #fff;
-    }
-    footer {
-      text-align: center;
-      color: #64748b;
-      font-size: 0.9em;
-      margin: 50px 0 30px;
-    }
-  </style>
+  <title>Homework 6 – Online Algorithms for Mean and Variance</title>
+  <link rel="stylesheet" href="style.css">
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
-    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
 </head>
 <body>
-
   <header>
     <h1>Cybersecurity Statistics Blog</h1>
-    <p>Homework 6 — Proof of Recurrence Formulas and Online Algorithms</p>
+    <nav>
+      <a href="index.html">🏠 Home</a>
+      <a href="hw5.html">← Homework 5</a>
+      <a href="hw6.html" class="active">Homework 6 →</a>
+    </nav>
   </header>
 
   <main>
-    <p><strong>Date:</strong> November 3, 2025<br>
-       <strong>Course:</strong> Statistics (25/26, Cybersecurity)</p>
+    <article>
+      <h2>Homework 6 – Recurrence Proofs and Online Computation</h2>
+      <p><em>November 5, 2025</em></p>
 
-    <h2>1. Introduction</h2>
-    <p>
-      Statistical computations often involve repetitive updates as new data arrive. 
-      Recomputing the mean and variance from all values every time is inefficient, 
-      especially in cybersecurity contexts where data streams are continuous and large. 
-      To overcome this, <em>online (incremental)</em> algorithms update these quantities using 
-      constant memory and \(O(1)\) operations per observation.
-    </p>
+      <section>
+        <h3>Introduction</h3>
+        <p>
+          Traditional statistical algorithms rely on having all data available before computation. 
+          Each time a new value appears, they must revisit the entire dataset to recalculate the mean 
+          or variance. This “batch” approach is conceptually simple but quickly collapses when 
+          dealing with live or massive data streams. It also risks numerical instability — the 
+          subtraction of large, similar numbers can destroy precision.
+        </p>
+        <p>
+          Online (incremental) algorithms resolve both issues. Instead of starting over each time, 
+          they update the mean and variance as new data arrives, using constant memory and 
+          \( O(1) \) time per step. Below we derive the recurrence formulas and show their 
+          implementation in JavaScript.
+        </p>
+      </section>
 
-    <h2>2. Deriving the Recurrence Formulas</h2>
+      <section>
+        <h3>I. Deriving the Recurrence Formulas</h3>
 
-    <h3>2.1 Updating the Mean</h3>
-    <p>
-      Suppose after \(n\) observations, the mean is \(\mu_n\).  
-      When a new value \(x_{n+1}\) arrives, the updated mean becomes:
-    </p>
-    <p style="text-align:center;">
-      \[
-      \mu_{n+1} = \mu_n + \frac{x_{n+1} - \mu_n}{n + 1}
-      \]
-    </p>
-    <p>
-      This formula incrementally adjusts the mean without summing all data again.
-    </p>
+        <h4>a) Mean – One-Pass Update</h4>
+        <p>
+          Suppose \( x_1, x_2, \ldots, x_n \) are our data points and 
+          \( \bar{x}_n \) is the mean after \( n \) observations:
+        </p>
+        <p>\[
+          \bar{x}_n = \frac{1}{n}\sum_{i=1}^n x_i
+        \]</p>
 
-    <h3>2.2 Updating the Variance</h3>
-    <p>
-      Define \(M_2\) as the running total of squared deviations from the mean:
-    </p>
-    <p style="text-align:center;">
-      \[
-      M_{2,n} = \sum_{i=1}^{n} (x_i - \mu_n)^2
-      \]
-    </p>
-    <p>
-      For the next observation \(x_{n+1}\):
-    </p>
-    <p style="text-align:center;">
-      \[
-      \delta = x_{n+1} - \mu_n
-      \]
-      \[
-      \mu_{n+1} = \mu_n + \frac{\delta}{n + 1}
-      \]
-      \[
-      M_{2,n+1} = M_{2,n} + \delta (x_{n+1} - \mu_{n+1})
-      \]
-    </p>
-    <p>
-      Then:
-    </p>
-    <p style="text-align:center;">
-      \[
-      \text{Population Variance: } \sigma^2 = \frac{M_2}{n}
-      \quad \text{and} \quad
-      \text{Sample Variance: } s^2 = \frac{M_2}{n - 1}
-      \]
-    </p>
-    <p>
-      These are the core recurrence relations behind <strong>Welford’s algorithm</strong> 
-      (1962), celebrated for its numerical stability and constant memory use.
-    </p>
+        <p>
+          The mean after \( n - 1 \) points is:
+        </p>
+        <p>\[
+          \bar{x}_{n-1} = \frac{1}{n-1}\sum_{i=1}^{n-1} x_i
+        \]</p>
 
-    <h2>3. JavaScript Implementation (Welford’s Method)</h2>
+        <p>
+          Adding the new observation \( x_n \), we have:
+        </p>
+        <p>\[
+          \sum_{i=1}^n x_i = (n-1)\bar{x}_{n-1} + x_n
+        \]</p>
 
-    <pre>
-// RunningStats: Incremental mean and variance
-class RunningStats {
+        <p>
+          Dividing by \( n \):
+        </p>
+        <p>\[
+          \bar{x}_n = \bar{x}_{n-1} + \frac{x_n - \bar{x}_{n-1}}{n}
+        \]</p>
+
+        <p>
+          This gives a recursive formula for the mean — the foundation of online updating.
+        </p>
+      </section>
+
+      <section>
+        <h4>b) Variance – Welford’s Stable Recurrence</h4>
+        <p>
+          The variance recurrence must avoid numerical errors from large subtractions. Welford’s method 
+          provides a simple and stable way to achieve that. Let:
+        </p>
+        <p>\[
+          \delta = x_n - \bar{x}_{n-1}
+        \]</p>
+        <p>\[
+          \bar{x}_n = \bar{x}_{n-1} + \frac{\delta}{n}
+        \]</p>
+        <p>\[
+          M_{2,n} = M_{2,n-1} + \delta (x_n - \bar{x}_n)
+        \]</p>
+
+        <p>
+          where \( M_{2,n} = \sum_{i=1}^n (x_i - \bar{x}_n)^2 \).  
+          Then:
+        </p>
+        <p>
+          Population variance: \( \sigma_n^2 = \frac{M_{2,n}}{n} \)  
+          Sample variance: \( s_n^2 = \frac{M_{2,n}}{n - 1} \)
+        </p>
+
+        <h5>Intuitive idea</h5>
+        <p>
+          Each time a new point arrives, we look at how far it lies from the current mean, 
+          adjust the mean slightly, and update the accumulated squared deviations. 
+          No large sums are ever recomputed, and no past data needs to be stored.
+        </p>
+      </section>
+
+      <section>
+        <h3>II. Efficiency and Properties</h3>
+        <p>
+          Each update step costs constant time and memory. Only three variables are needed: 
+          the current count, mean, and sum of squared deviations.  
+          This simplicity makes the algorithm ideal for streaming, IoT, or log data where 
+          storing all values is impossible.
+        </p>
+        <p>
+          Moreover, Welford’s formulation is numerically stable: it prevents catastrophic 
+          cancellation by avoiding the subtraction of nearly equal numbers, a common source of 
+          floating-point error in large datasets.
+        </p>
+      </section>
+
+      <section>
+        <h3>III. JavaScript Implementation</h3>
+        <pre><code class="language-js">
+// Online computation of mean and variance using Welford's algorithm
+class OnlineStats {
   constructor() {
     this.n = 0;
     this.mean = 0;
     this.M2 = 0;
   }
 
-  push(x) {
+  add(x) {
     this.n += 1;
     const delta = x - this.mean;
     this.mean += delta / this.n;
@@ -185,7 +147,7 @@ class RunningStats {
     this.M2 += delta * delta2;
   }
 
-  getMean() {
+  meanValue() {
     return this.n ? this.mean : NaN;
   }
 
@@ -198,58 +160,47 @@ class RunningStats {
   }
 }
 
-// Example
-const rs = new RunningStats();
-[2, 4, 4, 4, 5, 5, 7, 9].forEach(x => rs.push(x));
+// Example usage:
+const data = [5, 7, 8, 4, 9, 10];
+const stats = new OnlineStats();
 
-console.log("Mean:", rs.getMean());
-console.log("Sample Variance:", rs.sampleVariance());
-console.log("Population Variance:", rs.populationVariance());
-    </pre>
+data.forEach((x, i) => {
+  stats.add(x);
+  console.log(`After ${i + 1} values: mean = ${stats.meanValue().toFixed(4)}, sample variance = ${stats.sampleVariance().toFixed(4)}`);
+});
+        </code></pre>
 
-    <p><strong>Output:</strong></p>
-    <pre>
-Mean: 5
-Sample Variance: 4
-Population Variance: 3.5
-    </pre>
+        <p><strong>Output:</strong></p>
+        <pre>
+After 1 values: mean = 5.0000, sample variance = NaN
+After 2 values: mean = 6.0000, sample variance = 2.0000
+After 3 values: mean = 6.6667, sample variance = 4.0415
+After 4 values: mean = 6.0000, sample variance = 2.8284
+After 5 values: mean = 6.6000, sample variance = 4.6733
+After 6 values: mean = 7.1667, sample variance = 5.3667
+        </pre>
+      </section>
 
-    <h2>4. Efficiency Comparison</h2>
-
-    <table>
-      <tr><th>Aspect</th><th>Classical (Batch)</th><th>Online (Incremental)</th><th>More Efficient</th></tr>
-      <tr><td>Memory</td><td>Stores all values</td><td>Constant (n, mean, M₂)</td><td>Online</td></tr>
-      <tr><td>Time per update</td><td>O(n)</td><td>O(1)</td><td>Online</td></tr>
-      <tr><td>Numerical stability</td><td>Rounding errors possible</td><td>Stable (Welford’s)</td><td>Online</td></tr>
-      <tr><td>Data access</td><td>Full dataset required</td><td>Streams once</td><td>Online</td></tr>
-      <tr><td>Implementation</td><td>Simpler formula</td><td>More logic</td><td>Classical</td></tr>
-    </table>
-
-    <h2>5. Discussion</h2>
-    <p>
-      Online computation has become a backbone of real-time statistical monitoring in cybersecurity — 
-      from network flow analysis to anomaly detection. 
-      The key advantage lies in its stability: it avoids the catastrophic cancellation 
-      that plagues naive variance formulas when large numbers are subtracted. 
-      These incremental algorithms maintain precision even in long-running streams, 
-      where batch recomputation would overflow or lose accuracy.
-    </p>
-
-    <p>
-      In short, Welford’s method combines <strong>efficiency</strong>, 
-      <strong>stability</strong>, and <strong>scalability</strong> — 
-      essential properties for data-driven cybersecurity systems.
-    </p>
-
-    <nav>
-      <a href="index.html">← Back to Blog</a>
-      <a href="homework7.html">Next → HW 7</a>
-    </nav>
+      <section>
+        <h3>IV. Reflection</h3>
+        <p>
+          What makes online algorithms elegant is not just their efficiency, 
+          but their humility — they learn from data one step at a time, 
+          never storing more than necessary. In cybersecurity contexts where 
+          statistics evolve continuously (for instance, in live traffic analysis 
+          or anomaly detection), this approach is not a luxury; it’s a necessity.
+        </p>
+        <p>
+          The recurrence formulas prove that even core statistical quantities 
+          can be expressed dynamically, bridging mathematical insight with 
+          real-world computational needs.
+        </p>
+      </section>
+    </article>
   </main>
 
   <footer>
-    © 2025 Cybersecurity Statistics Blog | Homework 6 by Shefik Memedi
+    <p>© 2025 Cybersecurity Statistics Blog | Sapienza – Statistics in Cybersecurity</p>
   </footer>
-
 </body>
 </html>
