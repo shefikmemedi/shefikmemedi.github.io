@@ -3,198 +3,133 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Homework 5 – Measures of Location and Dispersion</title>
+  <title>Homework 5 — Measures of Location and Dispersion</title>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+  </script>
   <style>
     body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      line-height: 1.7;
-      margin: 0;
-      background: #fafafa;
+      font-family: 'Georgia', serif;
+      background-color: #fafafa;
       color: #222;
-      padding: 0;
-    }
-    header {
-      background: #1e293b;
-      color: white;
-      padding: 2rem 1rem;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 2rem;
-    }
-    main {
       max-width: 900px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin: 60px auto;
+      padding: 20px 40px;
+      line-height: 1.7;
+    }
+    h1, h2, h3 {
+      color: #0044cc;
+    }
+    h1 {
+      font-size: 2.2em;
+      margin-bottom: 0.2em;
     }
     h2 {
-      color: #1e293b;
-      margin-top: 1.5rem;
+      border-bottom: 2px solid #ddd;
+      padding-bottom: 0.3em;
     }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin: 1rem 0;
+    p {
+      text-align: justify;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 0.6rem;
-      text-align: left;
+    code {
+      background: #f3f3f3;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 0.95em;
     }
-    th {
-      background: #f1f5f9;
+    a {
+      color: #0044cc;
+      text-decoration: none;
     }
-    tr:nth-child(even) {
-      background: #f9fafb;
+    a:hover {
+      text-decoration: underline;
     }
     footer {
-      text-align: center;
-      padding: 1.5rem;
-      background: #1e293b;
-      color: #fff;
-      margin-top: 2rem;
-      font-size: 0.9rem;
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #666;
+      border-top: 1px solid #ddd;
+      padding-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Cybersecurity Statistics Blog</h1>
-    <p>Homework 5 – Measures of Location and Dispersion</p>
-  </header>
+  <h1>Homework 5 — Measures of Location and Dispersion</h1>
+  <p><em>Course: Statistics for Cybersecurity | Author: Shefik Memedi</em></p>
 
-  <main>
-    <section>
-      <h2>Introduction</h2>
-      <p>
-        Statistical analysis begins by understanding two core dimensions: 
-        <strong>location</strong> (where the data tend to cluster) and 
-        <strong>dispersion</strong> (how widely they spread). 
-        Together, these measures capture both the “center” and the “stability” of a dataset, 
-        forming the foundation of any inferential or computational analysis — 
-        from cybersecurity traffic metrics to financial risk assessment.
-      </p>
-    </section>
+  <h2>1. Introduction</h2>
+  <p>
+    In descriptive statistics, <strong>measures of location</strong> and 
+    <strong>measures of dispersion</strong> summarize the essential characteristics of data.
+    While measures of location describe the “center” or typical value of a dataset,
+    measures of dispersion quantify how much the data vary around that center.
+  </p>
 
-    <section>
-      <h2>Measures of Location (Central Tendency)</h2>
-      <p>
-        Measures of location identify the “center” of data. 
-        Different averages are used depending on the nature of data and the presence of outliers.
-      </p>
-      <table>
-        <tr>
-          <th>Measure</th>
-          <th>Formula / Definition</th>
-          <th>Typical Use</th>
-          <th>Remarks</th>
-        </tr>
-        <tr>
-          <td>Arithmetic Mean</td>
-          <td>Sum of all values / n</td>
-          <td>Symmetric numeric data</td>
-          <td>Most common; sensitive to outliers</td>
-        </tr>
-        <tr>
-          <td>Median</td>
-          <td>Middle value in ordered data</td>
-          <td>Skewed or non-normal data</td>
-          <td>Robust to outliers</td>
-        </tr>
-        <tr>
-          <td>Mode</td>
-          <td>Most frequent value</td>
-          <td>Categorical or discrete data</td>
-          <td>May be multiple or undefined</td>
-        </tr>
-        <tr>
-          <td>Geometric Mean</td>
-          <td>(∏xᵢ)^(1/n)</td>
-          <td>Growth rates, ratios</td>
-          <td>Requires positive data</td>
-        </tr>
-        <tr>
-          <td>Harmonic Mean</td>
-          <td>n / Σ(1/xᵢ)</td>
-          <td>Rates and speeds</td>
-          <td>Influenced by small values</td>
-        </tr>
-        <tr>
-          <td>Trimmed Mean</td>
-          <td>Mean after removing extremes</td>
-          <td>Data with mild outliers</td>
-          <td>Balance between mean & median</td>
-        </tr>
-      </table>
-    </section>
+  <h2>2. Measures of Location (Central Tendency)</h2>
+  <p>
+    The most common measures of location are:
+  </p>
+  <ul>
+    <li><strong>Arithmetic Mean:</strong> The simple average of all observations.
+      $$ \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i $$
+    </li>
+    <li><strong>Median:</strong> The middle value when data are ordered. It is robust against outliers.</li>
+    <li><strong>Mode:</strong> The most frequently occurring value in a dataset.</li>
+  </ul>
+  <p>
+    The mean is sensitive to extreme values, while the median is more stable when outliers are present.
+    The mode is especially useful for categorical or discrete data.
+  </p>
 
-    <section>
-      <h2>Measures of Dispersion (Variability)</h2>
-      <p>
-        While central tendency locates the typical value, dispersion quantifies the spread. 
-        High dispersion implies volatility; low dispersion indicates stability.
-      </p>
-      <table>
-        <tr>
-          <th>Measure</th>
-          <th>Formula / Description</th>
-          <th>Typical Use</th>
-          <th>Notes</th>
-        </tr>
-        <tr>
-          <td>Variance</td>
-          <td>Average squared deviation from mean</td>
-          <td>Quantifies spread mathematically</td>
-          <td>Highly sensitive to outliers</td>
-        </tr>
-        <tr>
-          <td>Standard Deviation</td>
-          <td>√(Variance)</td>
-          <td>Same units as data</td>
-          <td>Widely used measure of spread</td>
-        </tr>
-        <tr>
-          <td>Range</td>
-          <td>Max − Min</td>
-          <td>Quick estimate of spread</td>
-          <td>Completely driven by extremes</td>
-        </tr>
-        <tr>
-          <td>Interquartile Range (IQR)</td>
-          <td>Q₃ − Q₁</td>
-          <td>Middle 50% of data</td>
-          <td>Resistant to outliers</td>
-        </tr>
-        <tr>
-          <td>Coefficient of Variation (CV)</td>
-          <td>(σ / μ)</td>
-          <td>Relative variability</td>
-          <td>Useful for comparing across scales</td>
-        </tr>
-      </table>
-    </section>
+  <h2>3. Measures of Dispersion</h2>
+  <p>
+    Dispersion measures indicate how spread out the data are.
+  </p>
+  <ul>
+    <li><strong>Range:</strong> The difference between the maximum and minimum values.
+      $$ R = \max(x_i) - \min(x_i) $$
+    </li>
+    <li><strong>Variance:</strong> The average squared deviation from the mean.
+      $$ s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2 $$
+    </li>
+    <li><strong>Standard Deviation:</strong> The square root of the variance.
+      $$ s = \sqrt{s^2} $$
+    </li>
+    <li><strong>Interquartile Range (IQR):</strong> The difference between the 75th and 25th percentiles.
+      $$ IQR = Q_3 - Q_1 $$
+    </li>
+    <li><strong>Coefficient of Variation (CV):</strong> A normalized measure of dispersion.
+      $$ CV = \frac{s}{\bar{x}} \times 100\% $$
+    </li>
+  </ul>
 
-    <section>
-      <h2>Practical Relevance</h2>
-      <p>
-        In cybersecurity, measures of location and dispersion underpin anomaly detection 
-        and behavior modeling. For instance, the mean packet size may describe 
-        normal network behavior, while sudden spikes in variance might signal 
-        distributed attacks or abnormal data transfers. 
-        Hence, these statistics directly translate into operational insight.
-      </p>
-    </section>
+  <h2>4. Practical Use, Advantages, and Limitations</h2>
+  <p>
+    In cybersecurity analytics, measures of location and dispersion are fundamental for
+    understanding network traffic, anomaly detection, and performance metrics.
+    For instance, a high variance in response times might indicate unstable or suspicious network behavior.
+  </p>
+  <p>
+    <strong>Advantages:</strong> Mean and standard deviation are easy to compute and interpret.  
+    <strong>Limitations:</strong> Both are sensitive to outliers. Median and IQR provide better robustness for skewed data.
+  </p>
 
-  </main>
+  <h2>5. Summary Table</h2>
+  <table border="1" cellspacing="0" cellpadding="8">
+    <tr><th>Measure</th><th>Formula</th><th>Use</th><th>Outlier Sensitivity</th></tr>
+    <tr><td>Mean</td><td>\( \bar{x} = \frac{1}{n}\sum x_i \)</td><td>General central tendency</td><td>High</td></tr>
+    <tr><td>Median</td><td>Middle value</td><td>Skewed data</td><td>Low</td></tr>
+    <tr><td>Variance</td><td>\( s^2 = \frac{1}{n-1}\sum(x_i-\bar{x})^2 \)</td><td>Spread around mean</td><td>High</td></tr>
+    <tr><td>IQR</td><td>\( Q_3 - Q_1 \)</td><td>Middle 50% spread</td><td>Low</td></tr>
+  </table>
 
   <footer>
-    <p>© 2025 Shefik Memedi | Cybersecurity Statistics Blog</p>
+    <p>Next: <a href="homework6.html">Homework 6 — Online Mean & Variance</a></p>
+    <p><a href="index.html">← Back to home</a></p>
   </footer>
 
 </body>
 </html>
+
