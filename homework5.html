@@ -6,130 +6,228 @@
   <title>Homework 5 — Measures of Location and Dispersion</title>
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
-          src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
   </script>
   <style>
     body {
       font-family: 'Georgia', serif;
-      background-color: #fafafa;
-      color: #222;
       max-width: 900px;
       margin: 60px auto;
-      padding: 20px 40px;
+      background-color: #fdfdfd;
+      color: #222;
+      padding: 0 30px;
       line-height: 1.7;
     }
-    h1, h2, h3 {
-      color: #0044cc;
+    header {
+      border-bottom: 2px solid #eee;
+      margin-bottom: 30px;
     }
     h1 {
-      font-size: 2.2em;
+      font-size: 2.3em;
+      color: #0b4cc2;
       margin-bottom: 0.2em;
     }
     h2 {
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 0.3em;
+      color: #0b4cc2;
+      margin-top: 1.8em;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
     }
-    p {
-      text-align: justify;
+    h3 {
+      color: #0b4cc2;
+      margin-top: 1.2em;
     }
-    code {
-      background: #f3f3f3;
-      padding: 2px 5px;
-      border-radius: 4px;
-      font-size: 0.95em;
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 20px 0;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background-color: #eef4ff;
+    }
+    footer {
+      border-top: 1px solid #ddd;
+      margin-top: 40px;
+      padding-top: 10px;
+      font-size: 0.9em;
+      color: #666;
     }
     a {
-      color: #0044cc;
+      color: #0b4cc2;
       text-decoration: none;
     }
     a:hover {
       text-decoration: underline;
     }
-    footer {
-      margin-top: 40px;
-      font-size: 0.9em;
-      color: #666;
-      border-top: 1px solid #ddd;
-      padding-top: 10px;
+    em {
+      color: #444;
     }
   </style>
 </head>
-<body>
 
-  <h1>Homework 5 — Measures of Location and Dispersion</h1>
-  <p><em>Course: Statistics for Cybersecurity | Author: Shefik Memedi</em></p>
+<body>
+  <header>
+    <h1>Homework 5 — Measures of Location and Dispersion</h1>
+    <p><em>Course: Statistics for Cybersecurity (2025/26) — Shefik Memedi</em></p>
+  </header>
 
   <h2>1. Introduction</h2>
   <p>
-    In descriptive statistics, <strong>measures of location</strong> and 
-    <strong>measures of dispersion</strong> summarize the essential characteristics of data.
-    While measures of location describe the “center” or typical value of a dataset,
-    measures of dispersion quantify how much the data vary around that center.
+    In statistical analysis, understanding how data are distributed is essential for drawing reliable conclusions.
+    Two foundational descriptive tools are the <strong>measures of location</strong> (or central tendency)
+    and the <strong>measures of dispersion</strong> (or variability). The first describes
+    where the data tend to cluster, while the second explains how spread out the values are.
+    Together, they form the backbone of data interpretation, anomaly detection, and probabilistic reasoning —
+    especially relevant in cybersecurity, where variability may signal irregular or malicious activity.
   </p>
 
   <h2>2. Measures of Location (Central Tendency)</h2>
   <p>
-    The most common measures of location are:
-  </p>
-  <ul>
-    <li><strong>Arithmetic Mean:</strong> The simple average of all observations.
-      $$ \bar{x} = \frac{1}{n} \sum_{i=1}^{n} x_i $$
-    </li>
-    <li><strong>Median:</strong> The middle value when data are ordered. It is robust against outliers.</li>
-    <li><strong>Mode:</strong> The most frequently occurring value in a dataset.</li>
-  </ul>
-  <p>
-    The mean is sensitive to extreme values, while the median is more stable when outliers are present.
-    The mode is especially useful for categorical or discrete data.
+    Measures of location summarize a dataset by identifying a typical or central value.
+    Each type captures a different aspect of “center,” depending on the data’s shape and scale.
   </p>
 
-  <h2>3. Measures of Dispersion</h2>
-  <p>
-    Dispersion measures indicate how spread out the data are.
-  </p>
-  <ul>
-    <li><strong>Range:</strong> The difference between the maximum and minimum values.
-      $$ R = \max(x_i) - \min(x_i) $$
-    </li>
-    <li><strong>Variance:</strong> The average squared deviation from the mean.
-      $$ s^2 = \frac{1}{n-1} \sum_{i=1}^{n} (x_i - \bar{x})^2 $$
-    </li>
-    <li><strong>Standard Deviation:</strong> The square root of the variance.
-      $$ s = \sqrt{s^2} $$
-    </li>
-    <li><strong>Interquartile Range (IQR):</strong> The difference between the 75th and 25th percentiles.
-      $$ IQR = Q_3 - Q_1 $$
-    </li>
-    <li><strong>Coefficient of Variation (CV):</strong> A normalized measure of dispersion.
-      $$ CV = \frac{s}{\bar{x}} \times 100\% $$
-    </li>
-  </ul>
-
-  <h2>4. Practical Use, Advantages, and Limitations</h2>
-  <p>
-    In cybersecurity analytics, measures of location and dispersion are fundamental for
-    understanding network traffic, anomaly detection, and performance metrics.
-    For instance, a high variance in response times might indicate unstable or suspicious network behavior.
-  </p>
-  <p>
-    <strong>Advantages:</strong> Mean and standard deviation are easy to compute and interpret.  
-    <strong>Limitations:</strong> Both are sensitive to outliers. Median and IQR provide better robustness for skewed data.
-  </p>
-
-  <h2>5. Summary Table</h2>
-  <table border="1" cellspacing="0" cellpadding="8">
-    <tr><th>Measure</th><th>Formula</th><th>Use</th><th>Outlier Sensitivity</th></tr>
-    <tr><td>Mean</td><td>\( \bar{x} = \frac{1}{n}\sum x_i \)</td><td>General central tendency</td><td>High</td></tr>
-    <tr><td>Median</td><td>Middle value</td><td>Skewed data</td><td>Low</td></tr>
-    <tr><td>Variance</td><td>\( s^2 = \frac{1}{n-1}\sum(x_i-\bar{x})^2 \)</td><td>Spread around mean</td><td>High</td></tr>
-    <tr><td>IQR</td><td>\( Q_3 - Q_1 \)</td><td>Middle 50% spread</td><td>Low</td></tr>
+  <h3>2.1 Common Types</h3>
+  <table>
+    <tr>
+      <th>Measure</th>
+      <th>Definition & Formula</th>
+      <th>When to Use</th>
+      <th>Advantages</th>
+      <th>Limitations</th>
+    </tr>
+    <tr>
+      <td><strong>Arithmetic Mean</strong></td>
+      <td>\( \bar{x} = \frac{1}{n}\sum_{i=1}^n x_i \)</td>
+      <td>Symmetric data without extreme values.</td>
+      <td>Simple to compute, widely understood.</td>
+      <td>Highly sensitive to outliers.</td>
+    </tr>
+    <tr>
+      <td><strong>Median</strong></td>
+      <td>Middle value in ordered data.</td>
+      <td>Skewed data or data with outliers.</td>
+      <td>Robust; not affected by extremes.</td>
+      <td>Ignores exact distances between values.</td>
+    </tr>
+    <tr>
+      <td><strong>Mode</strong></td>
+      <td>Most frequent value(s) in the dataset.</td>
+      <td>Categorical or discrete data.</td>
+      <td>Useful for nominal variables.</td>
+      <td>May not exist or be unique.</td>
+    </tr>
+    <tr>
+      <td><strong>Geometric Mean</strong></td>
+      <td>\( G = \sqrt[n]{x_1 x_2 \cdots x_n} \)</td>
+      <td>Growth rates, ratios, returns.</td>
+      <td>Reduces impact of large values.</td>
+      <td>Requires positive data only.</td>
+    </tr>
+    <tr>
+      <td><strong>Harmonic Mean</strong></td>
+      <td>\( H = \frac{n}{\sum_{i=1}^n \frac{1}{x_i}} \)</td>
+      <td>Averages of rates (speed, density).</td>
+      <td>Balances influence of small numbers.</td>
+      <td>Strongly affected by very small values.</td>
+    </tr>
   </table>
+
+  <p>
+    In cybersecurity metrics, the arithmetic mean might summarize average packet delay,
+    while the median is preferred when large spikes (due to attacks or overloads) distort the mean.
+  </p>
+
+  <h2>3. Measures of Dispersion (Variability)</h2>
+  <p>
+    Dispersion measures describe how much the data values deviate from the central tendency.
+    High dispersion indicates unpredictability or instability; low dispersion reflects consistency.
+  </p>
+
+  <h3>3.1 Common Types</h3>
+  <table>
+    <tr>
+      <th>Measure</th>
+      <th>Definition & Formula</th>
+      <th>Use Case</th>
+      <th>Advantages</th>
+      <th>Limitations</th>
+    </tr>
+    <tr>
+      <td><strong>Range</strong></td>
+      <td>\( R = \max(x_i) - \min(x_i) \)</td>
+      <td>Quick measure of spread.</td>
+      <td>Simple to compute.</td>
+      <td>Based only on two data points; very unstable.</td>
+    </tr>
+    <tr>
+      <td><strong>Interquartile Range (IQR)</strong></td>
+      <td>\( IQR = Q_3 - Q_1 \)</td>
+      <td>Focuses on the middle 50% of the data.</td>
+      <td>Resistant to outliers.</td>
+      <td>Ignores extreme values completely.</td>
+    </tr>
+    <tr>
+      <td><strong>Variance</strong></td>
+      <td>\( s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \)</td>
+      <td>Foundation for inferential statistics.</td>
+      <td>Uses all data; mathematically tractable.</td>
+      <td>Expressed in squared units.</td>
+    </tr>
+    <tr>
+      <td><strong>Standard Deviation</strong></td>
+      <td>\( s = \sqrt{s^2} \)</td>
+      <td>Most used measure of variability.</td>
+      <td>Same units as data; intuitive interpretation.</td>
+      <td>Sensitive to outliers.</td>
+    </tr>
+    <tr>
+      <td><strong>Coefficient of Variation (CV)</strong></td>
+      <td>\( CV = \frac{s}{\bar{x}} \times 100\% \)</td>
+      <td>Compare variability across scales.</td>
+      <td>Unit-free; excellent for comparisons.</td>
+      <td>Undefined when \( \bar{x} \approx 0 \).</td>
+    </tr>
+  </table>
+
+  <h3>3.2 Analytical Perspective</h3>
+  <p>
+    Each measure provides a different view on variability:
+    <br><br>
+    • <strong>Variance</strong> and <strong>standard deviation</strong> form the basis for z-scores,
+      regression analysis, and hypothesis testing.<br>
+    • <strong>IQR</strong> is widely used in robust statistics and boxplots to detect outliers.<br>
+    • <strong>Coefficient of Variation</strong> is particularly useful in risk analysis,
+      comparing the relative volatility of datasets measured on different scales.
+  </p>
+
+  <h2>4. Applications in Cybersecurity</h2>
+  <p>
+    In network monitoring, dispersion measures can reveal instability or abnormal traffic.
+    A sudden increase in standard deviation of packet size or delay can indicate an attack or malfunction.
+    Similarly, using the median instead of the mean helps analysts avoid misleading interpretations
+    when data distributions are heavy-tailed or noisy.
+  </p>
+
+  <h2>5. Conclusion</h2>
+  <p>
+    Measures of location and dispersion are not merely descriptive tools — they are the foundation
+    for every higher-level statistical model. The balance between them captures both
+    the <em>expected behavior</em> and the <em>uncertainty</em> within data.
+    For cybersecurity and data science, understanding both aspects is crucial:
+    stability signals normality, while variability often points to risk.
+  </p>
 
   <footer>
     <p>Next: <a href="homework6.html">Homework 6 — Online Mean & Variance</a></p>
-    <p><a href="index.html">← Back to home</a></p>
+    <p><a href="index.html">← Back to main blog</a></p>
   </footer>
-
 </body>
 </html>
-
