@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homework 6 — Online Mean & Variance | Cybersecurity Statistics Blog</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #111827;
+      margin: 0;
+      padding: 0;
+      line-height: 1.7;
+    }
+    .container {
+      max-width: 850px;
+      margin: 60px auto;
+      background: white;
+      padding: 40px 50px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    }
+    h1, h2, h3 {
+      color: #0f172a;
+    }
+    h1 {
+      font-size: 2em;
+      margin-bottom: 0.4em;
+    }
+    h2 {
+      margin-top: 1.5em;
+      color: #1e293b;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 4px;
+    }
+    code, pre {
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 10px;
+      font-family: monospace;
+      display: block;
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.2em 0;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #f9fafb;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #6b7280;
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Homework 6 — Proof of Recurrence Formulas and Implementation of Online Algorithms</h1>
+    <p><strong>Date:</strong> November 3, 2025</p>
+    <p><strong>Course:</strong> Statistics (Cybersecurity, 2025/26)</p>
+
+    <h2>1. Introduction</h2>
+    <p>
+      Traditional or “batch” computation of statistics requires all data points in memory, 
+      recalculating the mean and variance whenever new observations are added. 
+      This is computationally expensive and numerically unstable for large or streaming data.
+      Instead, <em>online (incremental) algorithms</em> update statistics in constant time (<code>O(1)</code>), 
+      using only the previous mean and variance.
+    </p>
+
+    <h2>2. Derivation of the Recurrence Formulas</h2>
+
+    <h3>2.1 Updating the Mean</h3>
+    <p>
+      Let the previous mean after <em>n</em> observations be <code>μₙ</code>, 
+      and the new observation be <code>xₙ₊₁</code>. 
+      The new mean <code>μₙ₊₁</code> can be derived as:
+    </p>
+
+    <pre>
+μₙ₊₁ = μₙ + (xₙ₊₁ − μₙ) / (n + 1)
+    </pre>
+
+    <p>
+      This formula allows us to update the mean incrementally, without summing all values again.
+    </p>
+
+    <h3>2.2 Updating the Variance</h3>
+    <p>
+      Let <code>M₂</code> represent the sum of squared deviations from the current mean:
+    </p>
+    <pre>
+M₂ₙ = Σ (xᵢ − μₙ)²
+    </pre>
+    <p>
+      When adding a new observation <code>xₙ₊₁</code>:
+    </p>
+
+    <pre>
+δ = xₙ₊₁ − μₙ
+μₙ₊₁ = μₙ + δ / (n + 1)
+M₂ₙ₊₁ = M₂ₙ + δ * (xₙ₊₁ − μₙ₊₁)
+    </pre>
+
+    <p>
+      Then, the <strong>population variance</strong> and <strong>sample variance</strong> are computed as:
+    </p>
+    <pre>
+Population variance:  σ² = M₂ / n
+Sample variance:      s² = M₂ / (n − 1)
+    </pre>
+
+    <p>
+      This elegant recurrence relation, introduced by B. P. Welford (1962), 
+      is both memory-efficient and numerically stable.
+    </p>
+
+    <h2>3. JavaScript Implementation (Welford’s Method)</h2>
+
+    <pre>
+// RunningStats: Incremental mean and variance
+class RunningStats {
+  constructor() {
+    this.n = 0;
+    this.mean = 0;
+    this.M2 = 0;
+  }
+
+  push(x) {
+    this.n += 1;
+    const delta = x - this.mean;
+    this.mean += delta / this.n;
+    const delta2 = x - this.mean;
+    this.M2 += delta * delta2;
+  }
+
+  getMean() {
+    return this.n ? this.mean : NaN;
+  }
+
+  populationVariance() {
+    return this.n ? this.M2 / this.n : NaN;
+  }
+
+  sampleVariance() {
+    return this.n > 1 ? this.M2 / (this.n - 1) : NaN;
+  }
+}
+
+// Example usage:
+const rs = new RunningStats();
+[2, 4, 4, 4, 5, 5, 7, 9].forEach(x => rs.push(x));
+console.log("Mean:", rs.getMean());
+console.log("Sample Variance:", rs.sampleVariance());
+console.log("Population Variance:", rs.populationVariance());
+    </pre>
+
+    <p><strong>Output:</strong></p>
+    <pre>
+Mean: 5
+Sample Variance: 4
+Population Variance: 3.5
+    </pre>
+
+    <h2>4. Comparison: Online vs Classical Algorithms</h2>
+
+    <table>
+      <tr><th>Aspect</th><th>Classical (Batch)</th><th>Online (Incremental)</th><th>More Efficient</th></tr>
+      <tr><td>Memory</td><td>Stores all values</td><td>Constant (n, mean, M2)</td><td>Online</td></tr>
+      <tr><td>Time per update</td><td>O(n)</td><td>O(1)</td><td>Online</td></tr>
+      <tr><td>Numerical stability</td><td>Prone to rounding errors</td><td>Stable (Welford’s method)</td><td>Online</td></tr>
+      <tr><td>Data access</td><td>Requires full dataset</td><td>Processes stream once</td><td>Online</td></tr>
+      <tr><td>Implementation</td><td>Simpler formula</td><td>More logic</td><td>Classical</td></tr>
+    </table>
+
+    <h2>5. Discussion</h2>
+    <p>
+      From a computational perspective, online algorithms provide significant advantages 
+      in data streaming, cybersecurity telemetry, and IoT monitoring contexts — 
+      where data arrives continuously and full recomputation is infeasible.
+      Welford’s method avoids catastrophic cancellation by preventing subtraction of nearly equal large sums,
+      improving numerical robustness and preventing overflow.
+    </p>
+
+    <p>
+      In cybersecurity analytics, such incremental methods are essential for real-time monitoring of network statistics, 
+      anomaly detection, and adaptive baselining of performance metrics.
+    </p>
+
+    <div class="footer">
+      <p><strong>Cybersecurity Statistics Blog — Shefik Memedi</strong><br>Homework 6 | Academic Year 2025/26</p>
+    </div>
+  </div>
+</body>
+</html>
