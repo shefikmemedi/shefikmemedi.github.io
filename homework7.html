@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Homework 7 — Random Walks & Binomial Convergence</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: #fafafa;
+      color: #1e1e1e;
+      line-height: 1.65;
+      margin: 0;
+    }
+    header {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 2.5rem 1rem;
+    }
+    header h1 { margin: 0; font-size: 1.8rem; }
+    header p { color: #cfd9e6; margin-top: 0.3rem; font-size: 1rem; }
+    main {
+      max-width: 850px;
+      background: white;
+      margin: 2.5rem auto;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    h2, h3 { color: #0b4cc2; margin-top: 2rem; }
+    pre {
+      background: #f4f6f9;
+      padding: 14px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font-family: "Fira Code", monospace;
+      font-size: 0.95rem;
+    }
+    input, button {
+      padding: 6px 10px;
+      margin: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccd;
+      font-size: 0.95rem;
+    }
+    button {
+      background: #0b4cc2;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background: #093f9f; }
+    canvas { max-width: 780px; margin-top: 1.5rem; }
+    footer {
+      text-align: center;
+      padding: 1.5rem 0;
+      color: #6b7280;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Cybersecurity Statistics Blog</h1>
+    <p>Homework 7 — Random Walks & Binomial Convergence — Shefik Memedi 2226852</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Introduction</h2>
+      <p>
+        This homework explores the stochastic behavior of a server receiving weekly
+        security updates while facing attacks with probability \( p \).
+        Each week’s outcome contributes \( +1 \) if secure or \( -1 \) if breached.
+        Summing these over \( n \) weeks forms a discrete <strong>random walk</strong>,
+        whose distribution converges to a <strong>binomial law</strong> as the number
+        of trajectories \( m \) and trials \( n \) grow large.
+      </p>
+    </section>
+
+    <section>
+      <h2>I. Random Walk Simulation</h2>
+      <p>
+        The simulation below generates \( m \) random trajectories of length \( n \),
+        counts how many end at each possible total score, and compares empirical
+        frequencies with the theoretical binomial probabilities.
+      </p>
+
+      <label>Weeks (n): <input id="weeks" type="number" value="20" min="1"></label>
+      <label>Attackers (m): <input id="attackers" type="number" value="1000" min="1"></label>
+      <label>Attack success probability (p): <input id="prob" type="number" step="0.01" value="0.3" min="0" max="1"></label>
+      <button onclick="runSimulation()">Run Simulation</button>
+
+      <canvas id="chart"></canvas>
+
+      <script>
+        function runSimulation() {
+          const n = parseInt(document.getElementById('weeks').value);
+          const m = parseInt(document.getElementById('attackers').value);
+          const p = parseFloat(document.getElementById('prob').value);
+
+          const results = Array(m).fill(0);
+          for (let i = 0; i < m; i++) {
+            let score = 0;
+            for (let w = 0; w < n; w++) {
+              score += Math.random() < p ? -1 : +1;
+            }
+            results[i] = score;
+          }
+
+          const minScore = -n;
+          const maxScore = n;
+          const counts = Array(2 * n + 1).fill(0);
+          results.forEach(s => counts[s + n]++);
+          const freqs = counts.map(c => c / m);
+
+          const binomial = [];
+          for (let k = 0; k <= n; k++) {
+            const prob = combination(n, k) * Math.pow(1 - p, k) * Math.pow(p, n - k);
+            const totalScore = 2 * k - n;
+            binomial[totalScore + n] = prob;
+          }
+
+          drawChart(freqs, binomial, n);
+        }
+
+        function combination(n, k) {
+          if (k < 0 || k > n) return 0;
+          if (k === 0 || k === n) return 1;
+          let res = 1;
+          for (let i = 1; i <= k; i++) res = res * (n - i + 1) / i;
+          return res;
+        }
+
+        function drawChart(freqs, binomial, n) {
+          const ctx = document.getElementById('chart');
+          const labels = Array.from({length: 2 * n + 1}, (_, i) => i - n);
+          if (window.myChart) window.myChart.destroy();
+          window.myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [
+                { label: 'Simulated Frequencies', data: freqs, borderWidth: 1 },
+                { label: 'Theoretical Binomial', data: binomial, type: 'line', borderColor: 'red', fill: false }
+              ]
+            },
+            options: {
+              responsive: true,
+              scales: {
+                x: { title: { display: true, text: 'Total Score (Secure − Breach)' }},
+                y: { title: { display: true, text: 'Probability' }}
+              }
+            }
+          });
+        }
+      </script>
+    </section>
+
+    <section>
+      <h2>II. Random Walk and Binomial Connection</h2>
+      <p>
+        Each weekly outcome follows a Bernoulli variable \( X_i \in \{+1,-1\} \)
+        with \( P(X_i=+1)=1-p \) and \( P(X_i=-1)=p \).
+        The total score after \( n \) weeks is:
+        \[
+        S_n = \sum_{i=1}^n X_i = (2K - n)
+        \]
+        where \( K \) counts secure weeks.
+        Since \( K \sim Bin(n, 1-p) \), the random walk endpoints mirror a
+        <strong>shifted binomial distribution</strong>.
+      </p>
+    </section>
+
+    <section>
+      <h2>III. Convergence and the Law of Large Numbers</h2>
+      <p>
+        As \( m \) increases, the empirical histogram converges to the theoretical curve —
+        an illustration of the <strong>Law of Large Numbers</strong>.
+        Each simulated trajectory samples from the same Bernoulli process;
+        averaging over many trials smooths fluctuations and reveals the true
+        underlying probability mass function.
+      </p>
+      <p>
+        When \( n \) is small, the walk is irregular; as \( n \to \infty \),
+        the normalized distribution tends toward the <strong>Normal approximation</strong>
+        of the binomial, bridging discrete random walks with continuous Gaussian models.
+      </p>
+    </section>
+
+    <section>
+      <h2>IV. Discussion</h2>
+      <p>
+        The simulation shows how cybersecurity reliability under repeated attacks
+        can be treated statistically as a random walk process.
+        Each week’s binary outcome resembles coin tossing,
+        but here the “coin” is the uncertain defense against a breach.
+      </p>
+      <p>
+        The binomial link provides an exact theoretical baseline, while simulation
+        demonstrates convergence numerically — combining combinatorics and probability
+        into an interpretable cybersecurity analogy.
+      </p>
+    </section>
+  </main>
+
+  <footer>© 2025 Shefik Memedi — Cybersecurity Statistics Blog | Homework 7</footer>
+</body>
+</html>
