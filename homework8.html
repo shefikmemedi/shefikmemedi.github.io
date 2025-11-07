@@ -3,194 +3,305 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Homework 8 — Bernoulli Processes, Binomial Structures & Analogies</title>
+  <title>Homework 8 — Bernoulli Analogy, Pascal & Combinatorics</title>
 
+  <!-- Chart.js for plots -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- MathJax for equations -->
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script id="MathJax-script" async
     src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
-    body {
-      font-family: "Inter", system-ui, sans-serif;
-      background: #fafafa;
-      color: #1e1e1e;
-      line-height: 1.65;
-      margin: 0;
+    :root {
+      --bg: #fafafa;
+      --card: #fff;
+      --accent: #0b4cc2;
+      --muted: #667;
+      --mono: "Fira Code", monospace;
     }
-    header {
-      background: #0f172a;
-      color: white;
-      text-align: center;
-      padding: 2.5rem 1rem;
-    }
-    header h1 { margin: 0; font-size: 1.8rem; }
-    header p { color: #cfd9e6; margin-top: 0.3rem; font-size: 1rem; }
-    main {
-      max-width: 850px;
-      background: white;
-      margin: 2.5rem auto;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-    }
-    h2, h3 { color: #0b4cc2; margin-top: 2rem; }
-    pre {
-      background: #f4f6f9;
-      padding: 14px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font-family: "Fira Code", monospace;
-      font-size: 0.95rem;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-    }
-    th, td {
-      border: 1px solid #e4e7eb;
-      padding: 0.7rem;
-    }
-    th {
-      background: #f0f7ff;
-      text-align: left;
-    }
-    footer {
-      text-align: center;
-      padding: 1.5rem 0;
-      color: #6b7280;
-      font-size: 0.9rem;
-    }
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial; background:var(--bg); color:#111; margin:0}
+    header{background:#0f172a;color:#fff;padding:2.25rem 1rem;text-align:center}
+    header h1{margin:0;font-size:1.8rem}
+    header p{color:#cfd9e6;margin-top:.3rem}
+    main{max-width:950px;background:var(--card);margin:2.2rem auto;padding:2rem;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+    h2,h3{color:var(--accent);margin-top:1.5rem}
+    p{line-height:1.6}
+    .grid{display:grid;grid-template-columns:1fr;gap:18px}
+    .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    label{font-size:0.95rem}
+    input[type="number"],select{padding:6px 8px;border-radius:6px;border:1px solid #d6e0ee}
+    button{background:var(--accent);color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    button:hover{opacity:.95}
+    canvas{max-width:880px;margin-top:10px}
+    pre{background:#f4f6f9;padding:12px;border-radius:10px;overflow:auto;font-family:var(--mono);font-size:0.95rem}
+    .pascal{display:flex;gap:12px;flex-direction:column}
+    .triangle{font-family:var(--mono);white-space:pre;overflow:auto;background:#f9fafb;padding:12px;border-radius:8px;border:1px solid #eef2f7}
+    .tiny{font-size:0.9rem;color:var(--muted)}
+    .two-col{display:grid;grid-template-columns:1fr;gap:18px}
+    @media(min-width:900px){.two-col{grid-template-columns:1fr 420px}}
+    footer{text-align:center;padding:1rem 0;color:var(--muted);font-size:0.9rem;margin-top:14px}
+    a{color:var(--accent)}
   </style>
 </head>
-
 <body>
   <header>
     <h1>Cybersecurity Statistics Blog</h1>
-    <p>Homework 8 — Bernoulli Processes, Binomial Structures & Analogies — Shefik Memedi 2226852</p>
+    <p>Homework 8 — Bernoulli Analogy, Pascal & Combinatorics — Shefik Memedi 2226852</p>
   </header>
 
   <main>
     <section>
-      <h2>Introduction</h2>
+      <h2>Task & Plan</h2>
       <p>
-        This homework deepens the analysis from the previous experiment — the Bernoulli process
-        simulation of the Law of Large Numbers — and investigates its mathematical relationships
-        with binomial coefficients, Pascal’s triangle, the binomial expansion, and other combinatorial
-        structures. Through these connections, the statistical behavior of random cybersecurity events
-        can be interpreted as part of a broader combinatorial and probabilistic framework.
+        Discuss analogies between the Bernoulli-process simulation (Homework 7) and the present study:
+        similarities/differences, the Law of Large Numbers, and combinatorial relationships including
+        binomial coefficients, Pascal's triangle, the binomial expansion, connections to Fibonacci numbers,
+        and combinatorial identities. An interactive appendix demonstrates each idea.
       </p>
     </section>
 
     <section>
-      <h2>I. Analogy with the Previous Homework</h2>
+      <h2>I. Short Comparison with Homework 7 (Bernoulli process & LLN)</h2>
       <p>
-        In the earlier homework, each trajectory represented a server’s random walk through \( n \) weeks,
-        with each step modeled as a Bernoulli variable:
-        \[
-        X_i = 
-        \begin{cases}
-          +1, & \text{if secure (probability } 1 - p) \\
-          -1, & \text{if breached (probability } p)
-        \end{cases}
-        \]
-        The total score after \( n \) steps, \( S_n = \sum_{i=1}^{n} X_i = 2K - n \),
-        directly depended on the number \( K \) of successful defenses, following
-        a binomial distribution \( K \sim Bin(n, 1 - p) \).
+        Both homeworks simulate the same basic building block: repeated independent Bernoulli trials (weekly outcomes).
+        Homework 7 focused on interpreting each trial as \(X_i\in\{+1,-1\}\) (secure or breached) and showed that
+        the endpoint \(S_n=\sum_{i=1}^n X_i\) is a shifted binomial variable because the number of secure weeks \(K\)
+        satisfies \(K\sim\operatorname{Bin}(n,1-p)\). In Homework 8 we step back and examine the combinatorics that
+        generate the binomial probabilities and how they relate to classical objects (Pascal, binomial expansion, Fibonacci).
       </p>
 
       <p>
-        In both homeworks, the Bernoulli process lies at the core:
-        independent trials, binary outcomes, and statistical convergence.
-        In Homework 7, the focus was on the <em>empirical convergence</em> of random
-        walks to a theoretical binomial law; in this homework, the focus shifts to
-        the <em>mathematical and structural</em> properties underlying that same process.
+        Similarities: both use the Bernoulli process; both rely on the Law of Large Numbers (as sample size or number of trajectories grows, empirical frequencies approach true probabilities); both can be analyzed via binomial probabilities.
+      </p>
+
+      <p>
+        Differences: Homework 7 emphasized trajectory simulation and visual convergence; Homework 8 explores why the binomial probabilities have the particular coefficients they do, and how these coefficients organize into Pascal's triangle and satisfy many combinatorial identities used in analysis.
       </p>
     </section>
 
     <section>
-      <h2>II. The Binomial Framework</h2>
+      <h2>II. Combinatorics & Key Identities</h2>
+
+      <h3>Binomial coefficients</h3>
       <p>
-        The binomial distribution arises from the repeated application of the Bernoulli process.
-        Its probability mass function is given by:
-      </p>
-      <p style="text-align:center;">
+        The binomial coefficient
         \[
-        P(K = k) = \binom{n}{k} (1 - p)^k p^{n - k}
+          \binom{n}{k}=\frac{n!}{k!(n-k)!}
+        \]
+        counts the number of distinct trajectories with exactly \(k\) successes (secure weeks) in \(n\) independent trials.
+        The binomial probability mass function is
+        \[
+          P(K=k)=\binom{n}{k}(1-p)^k p^{\,n-k}.
         \]
       </p>
+
+      <h3>Binomial expansion</h3>
       <p>
-        The coefficients \( \binom{n}{k} \) not only count combinations but also form the
-        entries of <strong>Pascal’s triangle</strong>, which encodes the recursive identity:
+        Expanding \((x+y)^n\) yields
         \[
-        \binom{n}{k} = \binom{n-1}{k-1} + \binom{n-1}{k}
+          (x+y)^n=\sum_{k=0}^n \binom{n}{k} x^{k} y^{n-k},
         \]
-        This mirrors the recursive, step-by-step nature of both the Bernoulli process
-        and the random walk simulation, where each new observation builds on the previous one.
+        which is the generating polynomial of the binomial distribution: setting \(x=1-p\) and \(y=p\) produces the sum of probabilities (which equals 1).
+      </p>
+
+      <h3>Pascal's triangle</h3>
+      <p class="tiny">
+        Pascal's triangle provides a simple recurrence:
+        \(\binom{n}{k}=\binom{n-1}{k-1}+\binom{n-1}{k}\).
+      </p>
+      <div class="two-col">
+        <div>
+          <p>
+            Pascal’s triangle organizes coefficients by rows. It explains why the number of sequences with \(k\) successes in \(n\) trials can be built from counts for \(n-1\) trials.
+            This is the combinatorial source of the binomial recurrence used in many proofs.
+          </p>
+          <p>
+            We will also show interactively how Fibonacci numbers appear as sums along "shallow diagonals" of Pascal's triangle.
+          </p>
+        </div>
+
+        <div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <label>Rows: <input id="pascalRows" type="number" value="10" min="1" max="30"></label>
+            <button onclick="renderPascal()">Render Pascal</button>
+          </div>
+          <div class="triangle" id="pascalOutput" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>III. Fibonacci & Pascal — quick demo</h2>
+      <p>
+        A classical identity: summing numbers on the diagonals of Pascal's triangle yields Fibonacci numbers:
+        \[
+          F_{n} = \sum_{k=0}^{\lfloor (n-1)/2\rfloor}\binom{n-1-k}{k}.
+        \]
+        The demo below highlights a diagonal and computes the sum.
+      </p>
+
+      <div style="display:flex;gap:10px;align-items:center">
+        <label>Choose n (Fibonacci index): <input id="fibIndex" type="number" value="8" min="1" max="25"></label>
+        <button onclick="computeFibFromPascal()">Compute</button>
+      </div>
+      <p id="fibResult" class="tiny"></p>
+    </section>
+
+    <section>
+      <h2>IV. Interactive Bernoulli Simulation (again, with focus on combinatorics)</h2>
+      <p>
+        Run a Bernoulli-sampling experiment (repeat Homework 7 logic) but we'll add a small display linking the observed counts to the combinatorial coefficient \(\binom{n}{k}\).
+      </p>
+
+      <div class="controls">
+        <label>n (trials): <input id="n" type="number" value="12" min="1" max="50"></label>
+        <label>m (trajectories): <input id="m" type="number" value="2000" min="1" max="20000"></label>
+        <label>success prob (q = secure): <input id="q" type="number" step="0.01" value="0.7" min="0" max="1"></label>
+        <button onclick="runBernoulli()">Run</button>
+      </div>
+
+      <div class="grid" style="margin-top:8px">
+        <canvas id="bernChart"></canvas>
+        <pre id="countsOut" class="tiny" aria-live="polite"></pre>
+      </div>
+
+      <p class="tiny">
+        Interpretation: For each \(k\) (number of secure weeks), the theoretical probability is \(\binom{n}{k} q^k (1-q)^{n-k}\).
       </p>
     </section>
 
     <section>
-      <h2>III. Binomial Expansion and Probabilistic Symmetry</h2>
+      <h2>V. Mathematical Remarks & Identities</h2>
       <p>
-        The binomial theorem expands any power of a sum:
-        \[
-        (a + b)^n = \sum_{k=0}^{n} \binom{n}{k} a^k b^{n-k}.
-        \]
-        When \( a = (1 - p) \) and \( b = p \), the entire distribution of possible outcomes
-        for \( n \) trials appears within a single algebraic expression — a compact symbolic
-        version of what the simulation in Homework 7 computed numerically.
+        A few compact facts worth remembering:
       </p>
+      <ul>
+        <li>\(\sum_{k=0}^{n}\binom{n}{k}=2^n\) — row-sum of Pascal (counts all sequences of length \(n\)).</li>
+        <li>\(\sum_{k=0}^n (-1)^k\binom{n}{k}=0\) for \(n\ge1\) — binomial alternating sum.</li>
+        <li>Convolution: \(\binom{n+m}{r}=\sum_{k}\binom{n}{k}\binom{m}{r-k}\) (used in adding independent binomials).</li>
+      </ul>
+
       <p>
-        As \( n \) grows, the distribution becomes increasingly symmetric around
-        its mean \( E[K] = n(1 - p) \), a reflection of the Law of Large Numbers.
-        This symmetry in the coefficients of the expansion corresponds to the shape
-        of the random walk histogram observed previously.
+        For simulations: the Law of Large Numbers implies that empirical relative frequencies for each \(k\) converge to the theoretical probabilities as either the number of independent trajectories \(m\) increases (averaging many trials) or as the number of repetitions of the simulation increases. Increasing \(n\) changes the shape of the distribution (variance grows roughly like \(n p (1-p)\)), and when \(n\) becomes large a normal approximation becomes useful:
+        \[
+          Bin(n,p)\approx N(np, np(1-p)).
+        \]
       </p>
     </section>
 
-    <section>
-      <h2>IV. Fibonacci, Combinatorics, and Recursive Growth</h2>
-      <p>
-        The recursive structure of Pascal’s triangle also appears in the
-        <strong>Fibonacci sequence</strong>. When summed along its shallow diagonals,
-        Pascal’s triangle generates Fibonacci numbers:
-        \[
-        F_n = \sum_{k=0}^{\lfloor (n-1)/2 \rfloor} \binom{n-1-k}{k}.
-        \]
-        This recurrence mirrors the probabilistic evolution of the Bernoulli process,
-        where each new step depends on combinations of earlier possibilities.
-        Such structural overlap illustrates how combinatorial mathematics and probability
-        share the same recursive DNA.
-      </p>
-      <p>
-        In cybersecurity terms, this can be viewed as the recursive propagation of
-        defense success probabilities through time — each new defense builds on
-        multiple potential past states, exactly like Fibonacci recursion aggregates
-        past outcomes.
-      </p>
-    </section>
-
-    <section>
-      <h2>V. Discussion and Conclusion</h2>
-      <p>
-        Both Homework 7 and Homework 8 revolve around the same Bernoulli foundation.
-        Homework 7 visualized randomness through simulation and convergence;
-        Homework 8 formalizes that behavior through combinatorial and algebraic structures.
-      </p>
-      <p>
-        The connection between the binomial coefficients, Pascal’s triangle,
-        the binomial theorem, and even Fibonacci recursion reveals a unifying principle:
-        discrete probability and combinatorics describe the same underlying symmetry.
-        Whether modeled as a cybersecurity random walk or expressed as an algebraic expansion,
-        the mathematics of repetition, accumulation, and convergence remains the same.
-      </p>
-    </section>
   </main>
 
-  <footer>
-    © 2025 Shefik Memedi — Cybersecurity Statistics Blog | Homework 8
-  </footer>
+  <footer>© 2025 Shefik Memedi — Cybersecurity Statistics Blog | Homework 8</footer>
+
+  <!-- --- Scripts: Pascal, Fibonacci, Bernoulli sim & chart --- -->
+  <script>
+    // Utility: compute binomial coefficient
+    function comb(n, k) {
+      if (k < 0 || k > n) return 0;
+      k = Math.min(k, n - k);
+      let res = 1;
+      for (let i = 1; i <= k; i++) {
+        res = res * (n - k + i) / i;
+      }
+      return Math.round(res); // exact integer
+    }
+
+    // Render Pascal triangle as text
+    function renderPascal() {
+      const rows = Math.min(30, Math.max(1, parseInt(document.getElementById('pascalRows').value || 10)));
+      const lines = [];
+      for (let r = 0; r < rows; r++) {
+        const vals = [];
+        for (let k = 0; k <= r; k++) vals.push(String(comb(r, k)));
+        // center-ish formatting: join with spaces
+        const pad = ' '.repeat(Math.max(0, Math.floor((rows - r) / 1.2)));
+        lines.push(pad + vals.join('  '));
+      }
+      document.getElementById('pascalOutput').textContent = lines.join('\n');
+    }
+
+    // Fibonacci from Pascal diagonal identity
+    function computeFibFromPascal() {
+      const n = Math.max(1, Math.min(25, parseInt(document.getElementById('fibIndex').value || 8)));
+      // Compute F_n using sum of binomial diagonal: F_n = sum_{k>=0} C(n-1-k, k)
+      let sum = 0;
+      for (let k = 0; ; k++) {
+        const a = comb(n - 1 - k, k);
+        if (a === 0) break;
+        sum += a;
+      }
+      // also compute standard Fibonacci simple loop for sanity
+      let a = 0, b = 1;
+      for (let i = 1; i < n; i++) {
+        const c = a + b; a = b; b = c;
+      }
+      const fib = (n === 1) ? 1 : b;
+      document.getElementById('fibResult').textContent =
+        `Diagonal sum = ${sum}. Standard Fibonacci F_${n} = ${fib}. (They match by identity)`;
+    }
+
+    // Bernoulli simulation and chart
+    let bernChart = null;
+    function runBernoulli() {
+      const n = Math.max(1, Math.min(60, parseInt(document.getElementById('n').value || 12)));
+      const m = Math.max(1, Math.min(50000, parseInt(document.getElementById('m').value || 2000)));
+      const q = Math.min(1, Math.max(0, parseFloat(document.getElementById('q').value || 0.7)));
+
+      // simulate m trajectories, counting successes K per trajectory
+      const counts = new Array(n + 1).fill(0);
+      for (let i = 0; i < m; i++) {
+        let k = 0;
+        for (let t = 0; t < n; t++) {
+          if (Math.random() < q) k++;
+        }
+        counts[k]++;
+      }
+      const freqs = counts.map(c => c / m);
+
+      // theoretical probabilities
+      const probs = [];
+      for (let k = 0; k <= n; k++) {
+        probs.push(comb(n, k) * Math.pow(q, k) * Math.pow(1 - q, n - k));
+      }
+
+      const labels = counts.map((_, i) => String(i));
+      drawBernoulliChart(labels, freqs, probs);
+
+      // show counts with combinatorial link for a few k
+      const outEl = document.getElementById('countsOut');
+      let outText = `n=${n}, m=${m}, q=${q}\n\nk : count (theoryProb) [C(n,k)]\n`;
+      for (let k = 0; k <= n; k++) {
+        outText += `${k} : ${counts[k]} (${probs[k].toFixed(4)}) [${comb(n, k)}]\n`;
+      }
+      outEl.textContent = outText;
+    }
+
+    function drawBernoulliChart(labels, freqs, probs) {
+      const ctx = document.getElementById('bernChart').getContext('2d');
+      if (bernChart) bernChart.destroy();
+      bernChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            { label: 'Simulated freq', data: freqs, borderWidth: 1 },
+            { label: 'Theoretical Binomial', data: probs, type: 'line', borderColor: 'red', fill: false, tension:0.1 }
+          ]
+        },
+        options: {
+          plugins: { legend: { position: 'top' } },
+          scales: {
+            x: { title: { display: true, text: 'k (number of successes)'} },
+            y: { title: { display: true, text: 'Probability / Frequency' } }
+          }
+        }
+      });
+    }
+
+    // initial render
+    renderPascal();
+    computeFibFromPascal();
+  </script>
 </body>
 </html>
-
