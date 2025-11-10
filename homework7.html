@@ -97,6 +97,10 @@
       <label>Attack success probability (p): <input id="prob" type="number" step="0.01" value="0.3" min="0" max="1"></label>
       <button onclick="runSimulation()">Run Simulation</button>
 
+      <h3>Sample Random Walk Trajectories</h3>
+      <canvas id="trajectoryChart"></canvas>
+
+      <h3>Distribution of Final Scores</h3>
       <canvas id="chart"></canvas>
 
       <script>
@@ -106,14 +110,23 @@
           const p = parseFloat(document.getElementById('prob').value);
 
           const results = Array(m).fill(0);
+          const trajectories = [];
+
           for (let i = 0; i < m; i++) {
             let score = 0;
+            const path = [0];
             for (let w = 0; w < n; w++) {
               score += Math.random() < p ? -1 : +1;
+              path.push(score);
             }
             results[i] = score;
+            trajectories.push(path);
           }
 
+          // Plot a subset of trajectories (e.g., first 20)
+          drawTrajectories(trajectories.slice(0, 20), n);
+
+          // Compute distribution
           const minScore = -n;
           const maxScore = n;
           const counts = Array(2 * n + 1).fill(0);
@@ -147,7 +160,7 @@
             data: {
               labels: labels,
               datasets: [
-                { label: 'Simulated Frequencies', data: freqs, borderWidth: 1 },
+                { label: 'Simulated Frequencies', data: freqs, borderWidth: 1, backgroundColor: '#60a5fa' },
                 { label: 'Theoretical Binomial', data: binomial, type: 'line', borderColor: 'red', fill: false }
               ]
             },
@@ -156,6 +169,32 @@
               scales: {
                 x: { title: { display: true, text: 'Total Score (Secure − Breach)' }},
                 y: { title: { display: true, text: 'Probability' }}
+              }
+            }
+          });
+        }
+
+        function drawTrajectories(paths, n) {
+          const ctx = document.getElementById('trajectoryChart');
+          const labels = Array.from({ length: n + 1 }, (_, i) => i);
+          if (window.trajChart) window.trajChart.destroy();
+          const datasets = paths.map((path, i) => ({
+            label: 'Trajectory ' + (i + 1),
+            data: path,
+            borderColor: `hsl(${(i * 360 / paths.length)}, 80%, 45%)`,
+            borderWidth: 1,
+            fill: false,
+            pointRadius: 0
+          }));
+          window.trajChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false }},
+              scales: {
+                x: { title: { display: true, text: 'Week' }},
+                y: { title: { display: true, text: 'Cumulative Score' }}
               }
             }
           });
