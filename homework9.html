@@ -1,241 +1,419 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Homework 9 — Probability, Measure Theory & Counting Processes</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Homework 9 — Axioms, Probability Models & Counting Processes — Shefik Memedi 2226852</title>
 
-<style>
-  body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
-    margin: 0;
-    padding: 40px;
-    background: #fafafa;
-    color: #111;
-  }
-  .wrap {
-    max-width: 900px;
-    margin: 0 auto;
-    background: #fff;
-    padding: 28px;
-    border-radius: 10px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
-  }
-  h1, h2 { color: #0b3b3b; }
-  canvas { margin: 20px 0; max-width: 100%; }
-  input[type=number], input[type=range] {
-    width: 160px;
-    padding: 6px;
-    margin: 6px 0;
-  }
-  button {
-    padding: 8px 12px;
-    border: none;
-    background: #0b3b3b;
-    color: #fff;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-top: 8px;
-  }
-</style>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root{
+      --bg:#fafafa;
+      --card:#fff;
+      --accent:#0b4cc2;
+      --muted:#667;
+      --mono: "Fira Code", monospace;
+    }
+    body {
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      background: var(--bg);
+      color: #111;
+      margin: 0;
+      line-height: 1.6;
+    }
+    header {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 2.2rem 1rem;
+    }
+    header h1 { margin: 0; font-size: 1.6rem; }
+    header p { margin: .4rem 0 0; color: #cfd9e6; }
+
+    main {
+      max-width: 920px;
+      margin: 2rem auto;
+      background: var(--card);
+      padding: 1.6rem 1.8rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(7,10,15,0.06);
+    }
+
+    h2 { color: var(--accent); margin-top: 1.4rem; }
+    h3 { color: #0b3b3b; margin-top: 1rem; }
+
+    .controls { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:8px; }
+    label { font-size:0.95rem; color: #0b3b3b; }
+    input[type=number] { padding:6px 8px; border-radius:6px; border:1px solid #e1e8f0; width:110px; }
+    button { background:var(--accent); color:white; border:none; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    button.secondary { background:#334155; }
+
+    pre { background:#f4f6f9; padding:12px; border-radius:8px; overflow:auto; font-family:var(--mono); font-size:0.95rem; }
+    .grid { display:grid; grid-template-columns: 1fr; gap:18px; }
+    @media(min-width:980px){ .grid{ grid-template-columns: 1fr 420px } }
+
+    .chart-card { background:#fff; padding:10px; border-radius:10px; border:1px solid #eef2f7; }
+    .muted { color: var(--muted); font-size:0.95rem; }
+    footer { text-align:center; color:var(--muted); padding:1.2rem 0; font-size:0.9rem; }
+    .stats { margin-top:10px; font-weight:600; }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
-<h1>Homework 9 — Probability Foundations, Measure Theory & Counting Processes</h1>
-<p class="sub">Shefik Memedi — Cybersecurity Statistics Blog</p>
+  <header>
+    <h1>Homework 9 — Axioms, Probability Models & Counting Processes</h1>
+    <p>Shefik Memedi — Cybersecurity Statistics Blog — 2226852</p>
+  </header>
 
-<h2>I. Interpretations of Probability</h2>
+  <main>
+    <section>
+      <h2>I. Interpretations of Probability and the Axiomatic Resolution</h2>
+      <p>
+        Probability has several useful interpretations:
+      </p>
+      <ul>
+        <li><strong>Classical:</strong> Probability as the ratio of favorable to equally-likely outcomes (cards, dice).</li>
+        <li><strong>Frequentist:</strong> Probability as long-run relative frequency under repeated trials.</li>
+        <li><strong>Bayesian:</strong> Probability as a degree of belief updated by evidence.</li>
+        <li><strong>Geometric:</strong> Probability defined by length/area/volume ratios (Buffon’s needle, geometric probability).</li>
+      </ul>
 
-<p>
-Probability has grown through several different philosophies, each fitting different kinds of problems.  
-The <strong>classical interpretation</strong> views probability as the ratio of favorable to total equally likely outcomes; elegant for dice or cards, but too rigid for real-world uncertainty.  
-The <strong>frequentist interpretation</strong> sees probability as the long-run relative frequency of an event, matching the intuitive behavior of simulations.  
-The <strong>Bayesian view</strong> treats probability as a degree of belief updated by evidence, allowing coherent reasoning even with little data.  
-The <strong>geometric interpretation</strong> defines probability via lengths, areas, or volumes, as in Buffon-type problems.
-</p>
+      <p>
+        These perspectives can conflict in edge cases: classical requires symmetry, frequentist requires infinite repeats, Bayesian introduces subjectivity. Kolmogorov’s <em>axiomatic approach</em> resolves these tensions by defining probability as a measure \(P\) on a sigma-algebra \(\mathcal{F}\) of events over a sample space \(\Omega\), satisfying:
+      </p>
 
-<p>
-These interpretations sometimes clash conceptually. For instance, the classical interpretation assumes symmetry, while the frequentist one requires infinite repetitions, and the Bayesian one introduces subjectivity.  
-The modern solution is the <strong>axiomatic approach</strong> developed by Kolmogorov. Instead of relying on philosophical motivations, probability is defined as a measure on a sigma-algebra.  
-The axioms provide a minimal and universal foundation:
-</p>
+      <p style="text-align:center;">
+        \(\displaystyle P(A)\ge0,\quad P(\Omega)=1,\quad\text{and for disjoint }A_i,\; P\Big(\bigcup_{i=1}^\infty A_i\Big)=\sum_{i=1}^\infty P(A_i).\)
+      </p>
 
-<ol>
-  <li>Non-negativity: \( P(A) \ge 0 \)</li>
-  <li>Normalization: \( P(\Omega)=1 \)</li>
-  <li>Countable additivity: for disjoint events,  
-      \( P\left(\bigcup A_i\right)=\sum P(A_i) \)</li>
-</ol>
+      <p>
+        Any model (classical, frequentist, Bayesian, geometric) that produces a function satisfying these axioms becomes a valid probability model. The axioms are intentionally minimal: they keep the formal apparatus while leaving interpretation flexible.
+      </p>
+    </section>
 
-<p>
-Every interpretation that respects these axioms becomes consistent. Bayesian probabilities, frequencies, classical symmetries, and geometric measures all produce valid probability measures.
-</p>
+    <section>
+      <h2>II. Probability & Measure Theory (concise)</h2>
+      <p>
+        Key measure-theoretic objects:
+      </p>
+      <ul>
+        <li>\(<strong>\Omega</strong>\): sample space (all outcomes).</li>
+        <li>\(<strong>\mathcal{F}</strong>\): sigma-algebra of events (closed under complement and countable unions).</li>
+        <li>\(<strong>P</strong>:\) probability measure \(P:\mathcal{F}\to[0,1]\) with \(P(\Omega)=1\) and countable additivity.</li>
+      </ul>
 
-<h2>II. Probability & Measure Theory</h2>
+      <p>
+        A <strong>random variable</strong> \(X:\Omega\to \mathbb{R}\) is a measurable function: \(X^{-1}(B)\in\mathcal{F}\) for every Borel set \(B\). Expectations are integrals:
+      </p>
+      <p style="text-align:center;">\(\displaystyle \mathbb{E}[X]=\int_\Omega X(\omega)\, dP(\omega).\)</p>
 
-<p>
-Measure theory provides the formal language for modern probability. A <strong>sigma-algebra</strong> is a collection of sets closed under complements and countable unions; it represents all events whose probability we are allowed to talk about.  
-A <strong>probability measure</strong> is a function \(P\) assigning numbers to these events in a way that respects the axioms above.  
-A <strong>random variable</strong> is a measurable function from outcomes to real numbers; this guarantees that inverse images of Borel sets are measurable events, allowing us to assign probabilities to them.
-</p>
+      <p class="muted">
+        This formalism handles continuous distributions, conditioning on zero-probability events (via regular conditional probabilities), and provides a single language that unifies discrete and continuous probability.
+      </p>
+    </section>
 
-<p>
-Expectation becomes an integral,  
-\[
-E[X] = \int_\Omega X \, dP,
-\]
-and distributions become pushforward measures.  
-This machinery resolves paradoxes from older interpretations, especially those involving conditioning, infinite sets, or continuous distributions.
-</p>
+    <section>
+      <h2>III. From Axioms: Subadditivity & Inclusion–Exclusion</h2>
 
-<h2>III. Subadditivity & Inclusion–Exclusion</h2>
+      <h3>Subadditivity</h3>
+      <p>
+        For any two events \(A,B\subseteq\Omega\),
+      </p>
+      <p style="text-align:center;">\(\displaystyle P(A\cup B)\le P(A)+P(B).\)</p>
 
-<h3>Subadditivity</h3>
-<p>
-Using only the axioms:
-</p>
-\[
-P(A \cup B) \le P(A) + P(B).
-\]
-<p>
-Reason:  
-\(A \cup B\) is a subset of the disjoint union \((A \setminus B) \cup B\).  
-Countable additivity on disjoint sets gives the result directly.
-</p>
+      <p>
+        <em>Proof (using axioms).</em> Write \(A\cup B = A \cup (B\setminus A)\). The sets \(A\) and \(B\setminus A\) are disjoint, so by countable additivity
+      </p>
+      <p style="text-align:center;">
+        \(\displaystyle P(A\cup B)=P(A)+P(B\setminus A)\le P(A)+P(B).\)
+      </p>
+      <p>
+        The final inequality follows because \(B\setminus A\subseteq B\), hence \(P(B\setminus A)\le P(B)\) by monotonicity (which itself follows from additivity and non-negativity).
+      </p>
 
-<h3>Inclusion–Exclusion</h3>
-<p>
-For two sets:
-</p>
-\[
-P(A \cup B)=P(A)+P(B)-P(A \cap B).
-\]
-<p>
-The idea generalizes, alternating between additions and subtractions.  
-This corrects the over-counting that happens when we add the individual probabilities.
-</p>
+      <h3>Inclusion–Exclusion (two events)</h3>
+      <p>
+        Exactly:
+      </p>
+      <p style="text-align:center;">
+        \(\displaystyle P(A\cup B)=P(A)+P(B)-P(A\cap B).\)
+      </p>
+      <p>
+        <em>Proof.</em> Start from disjoint decomposition \(A\cup B = A\setminus B \; \cup\; B\setminus A \; \cup\; (A\cap B)\). Countable additivity gives
+      </p>
+      <p style="text-align:center;">
+        \(\displaystyle P(A\cup B)=P(A\setminus B)+P(B\setminus A)+P(A\cap B).\)
+      </p>
+      <p>
+        Also \(P(A)=P(A\setminus B)+P(A\cap B)\) and similar for \(B\). Add the two equalities and rearrange to obtain the formula above.
+      </p>
 
-<hr>
+      <p class="muted">
+        The full inclusion–exclusion for \(n\) sets follows the same alternating pattern and is derived by repeated application of additivity and set algebra.
+      </p>
+    </section>
 
-<h2>IV. Simulation of a Counting Process</h2>
+    <section>
+      <h2>IV. Counting Process: Poisson Approximation by Bernoulli Subintervals</h2>
+      <p>
+        We'll simulate a counting process on the time interval \(T=1\). The classical construction:
+      </p>
+      <ol>
+        <li>Divide \([0,1]\) into \(n\) equal subintervals of length \(\Delta t = 1/n\).</li>
+        <li>In each subinterval generate an event with probability \(p=\lambda\Delta t=\lambda/n\).</li>
+        <li>Count events; in the limit \(n\to\infty\), this approximates a Poisson(\(\lambda\)) process.</li>
+      </ol>
 
-<p>
-We now simulate a counting process on the interval \(T=1\).  
-Divide it into \(n\) subintervals and generate an event in each one with probability \(\lambda/n\).  
-As \(n\) becomes large, this approximates a <strong>Poisson process</strong> with rate \(\lambda\).
-</p>
+      <p>
+        The Poisson process with rate \(\lambda>0\) is the continuous-time counting process \(\{N(t):t\ge0\}\) with independent and stationary increments and
+      </p>
+      <p style="text-align:center;">
+        \(\displaystyle P(N(t+s)-N(t)=k)=\frac{(\lambda s)^k e^{-\lambda s}}{k!}.\)
+      </p>
 
-<p>
-The Poisson process has three key properties:
-</p>
-<ul>
-  <li>Independent increments</li>
-  <li>Stationary increments</li>
-  <li>Poisson distribution of counts</li>
-</ul>
+      <p class="muted">Interpretation: \(\lambda\) is the average number of events per unit time.</p>
+    </section>
 
-<p>
-The parameter \(\lambda\) is the expected number of events per unit time.  
-Simulating many small Bernoulli trials with success probability \(\lambda/n\) reproduces the same structure in the limit.
-</p>
+    <section>
+      <h3>Interactive simulation</h3>
+      <div class="controls">
+        <div>
+          <label>λ (rate)</label><br>
+          <input id="lambda" type="number" value="5" min="0" step="0.5">
+        </div>
+        <div>
+          <label>n (subintervals)</label><br>
+          <input id="n" type="number" value="5000" min="200" step="200">
+        </div>
+        <div style="align-self:end">
+          <button onclick="runSim()">Run simulation</button>
+          <button class="secondary" onclick="runMany()">Simulate many (histogram)</button>
+        </div>
+      </div>
 
-<h3>Simulation Controls</h3>
+      <div style="margin-top:14px" class="grid">
+        <div>
+          <div class="chart-card">
+            <h3 style="margin:6px 0">Cumulative count — one realization</h3>
+            <canvas id="cumChart" height="220"></canvas>
+            <div id="oneSummary" class="muted stats"></div>
+          </div>
+        </div>
 
-<label>λ (rate):</label><br>
-<input type="number" id="lambda" value="5" min="0" step="0.5"><br>
+        <div>
+          <div class="chart-card">
+            <h3 style="margin:6px 0">Event-time histogram & Poisson PMF</h3>
+            <canvas id="histChart" height="220"></canvas>
+            <div id="histSummary" class="muted stats"></div>
+          </div>
+        </div>
+      </div>
 
-<label>n (subintervals):</label><br>
-<input type="number" id="n" value="5000" min="100" step="100"><br>
+      <div style="margin-top:14px" class="chart-card">
+        <h3 style="margin:6px 0">Distribution of counts (many realizations)</h3>
+        <canvas id="countDist" height="220"></canvas>
+        <div id="distSummary" class="muted stats"></div>
+      </div>
+    </section>
 
-<button onclick="runSimulation()">Run Simulation</button>
+    <section>
+      <h2>V. Theoretical properties & discussion</h2>
+      <p>
+        <strong>What the simulation approximates:</strong> the Bernoulli-splitting of \([0,1]\) converges to a Poisson(\(\lambda\)) process as \(n\to\infty\). Counts over disjoint time windows are independent (independent Bernoulli blocks), and the expected number of events in any interval of length \(t\) is \(\lambda t\).
+      </p>
 
-<h3>Results</h3>
+      <p>
+        <strong>Why the Poisson law appears:</strong> for fixed \(t\), the number of successes in \(n t\) Bernoulli trials with probability \(\lambda/n\) has distribution \(Bin(\lfloor nt\rfloor,\lambda/n)\). As \(n\to\infty\) this binomial converges to Poisson(\(\lambda t\)) because
+      </p>
+      <p style="text-align:center;">
+        \(\displaystyle \lim_{n\to\infty} \binom{n}{k}\Big(\frac{\lambda}{n}\Big)^k\Big(1-\frac{\lambda}{n}\Big)^{n-k} = \frac{(\lambda)^k e^{-\lambda}}{k!}.\)
+      </p>
 
-<canvas id="countPlot" width="800" height="300"></canvas>
-<canvas id="histPlot" width="800" height="250"></canvas>
+      <p>
+        <strong>Rate parameter \(\lambda\):</strong> determines the mean and variance of counts per unit time (both equal to \(\lambda\)), and controls the intensity of events. In a cybersecurity context \(\lambda\) could represent average weekly intrusion attempts or alerts.
+      </p>
+    </section>
 
-<p id="summary"></p>
+    <section>
+      <h2>VI. Summary</h2>
+      <p>
+        We used axioms to reconcile interpretations of probability and linked probability to measure theory to provide a rigorous foundation. From the axioms we derived subadditivity and inclusion–exclusion. The Bernoulli-subinterval construction approximates the Poisson process — a standard bridge between discrete and continuous models — and the simulation visualizes independent, stationary increments and the Poisson count law.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    © 2025 Shefik Memedi — Cybersecurity Statistics Blog
+  </footer>
 
 <script>
-function runSimulation() {
-  const lambda = parseFloat(document.getElementById("lambda").value);
-  const n = parseInt(document.getElementById("n").value);
+/* Utilities */
+function factorial(k){
+  if(k <= 1) return 1;
+  let r = 1;
+  for(let i=2;i<=k;i++) r *= i;
+  return r;
+}
+function poissonPMF(k, lambda){ return Math.exp(-lambda) * Math.pow(lambda, k) / factorial(k); }
+
+/* Charts setup */
+let cumChart = null, histChart = null, distChart = null;
+
+function runSim() {
+  const lambda = parseFloat(document.getElementById('lambda').value);
+  let n = parseInt(document.getElementById('n').value);
+  if(n < 200) n = 200;
   const p = lambda / n;
   const dt = 1 / n;
 
+  // single realization
   let count = 0;
-  const times = [];
-  const traj = [];
-
-  for (let i = 0; i < n; i++) {
-    if (Math.random() < p) {
+  const cumCounts = []; // length n+1
+  const eventTimes = [];
+  cumCounts.push(0);
+  for(let i=0;i<n;i++){
+    if(Math.random() < p){
       count++;
-      times.push(i * dt);
+      eventTimes.push((i+1)*dt); // event at end of interval
     }
-    traj.push(count);
+    cumCounts.push(count);
   }
 
-  drawLine("countPlot", traj);
-  drawHistogram("histPlot", times);
+  // draw cumulative chart
+  drawCumChart(cumCounts, dt, lambda);
 
-  const theoreticalMean = lambda;
-  const variance = lambda;
+  // draw histogram of event times (bins)
+  drawEventHistogram(eventTimes, lambda);
 
-  document.getElementById("summary").innerHTML =
-    "<strong>Total events:</strong> " + count +
-    "<br><strong>Theoretical mean:</strong> " + theoreticalMean +
-    "<br><strong>Theoretical variance:</strong> " + variance +
-    "<br><strong>Interpretation:</strong> The simulation closely matches a Poisson process with rate λ; independent increments and Poisson-distributed counts emerge naturally.";
+  // summary
+  document.getElementById('oneSummary').innerHTML =
+    `Events (realization): <strong>${count}</strong> — Expected (λ): <strong>${lambda.toFixed(3)}</strong>`;
+
+  // Also precompute theoretical Poisson distribution of counts for whole interval
+  const maxK = Math.max(15, Math.min(50, Math.ceil(lambda*3 + 10)));
+  const counts = [];
+  for(let k=0;k<=maxK;k++) counts.push(poissonPMF(k, lambda));
+  // show on histogram summary
+  document.getElementById('histSummary').innerHTML =
+    `Poisson(λ) theoretical mass shown as overlay; mean & variance = λ = <strong>${lambda.toFixed(3)}</strong>.`;
 }
 
-function drawLine(id, data) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  const maxY = Math.max(...data);
-  const scaleX = canvas.width / data.length;
-  const scaleY = canvas.height / maxY;
-
-  ctx.beginPath();
-  ctx.moveTo(0, canvas.height);
-
-  for (let i = 0; i < data.length; i++) {
-    ctx.lineTo(i * scaleX, canvas.height - data[i] * scaleY);
+/* Run many simulations to build empirical distribution of counts */
+function runMany(){
+  const lambda = parseFloat(document.getElementById('lambda').value);
+  let n = parseInt(document.getElementById('n').value); if(n<200) n=200;
+  const p = lambda / n;
+  const trials = 1500; // many realizations for distribution
+  const counts = [];
+  for(let t=0;t<trials;t++){
+    let c = 0;
+    for(let i=0;i<n;i++) if(Math.random() < p) c++;
+    counts.push(c);
   }
 
-  ctx.strokeStyle = "#0b3b3b";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-}
+  // histogram of counts
+  const maxC = Math.max(...counts);
+  const bins = Array(maxC+1).fill(0);
+  counts.forEach(v => bins[v]++);
+  const probs = bins.map(b => b / trials);
 
-function drawHistogram(id, times) {
-  const canvas = document.getElementById(id);
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  // theoretical Poisson
+  const maxK = bins.length - 1;
+  const poisson = [];
+  for(let k=0;k<=maxK;k++) poisson.push(poissonPMF(k, parseFloat(document.getElementById('lambda').value)));
 
-  const bins = 20;
-  const freq = Array(bins).fill(0);
-
-  times.forEach(t => {
-    let b = Math.floor(t * bins);
-    if (b >= bins) b = bins - 1;
-    freq[b]++;
+  // draw dist chart
+  const ctx = document.getElementById('countDist').getContext('2d');
+  if(distChart) distChart.destroy();
+  distChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: bins.map((_,i)=>String(i)),
+      datasets: [
+        { label: 'Empirical freq', data: probs, backgroundColor: '#60a5fa' },
+        { label: 'Poisson PMF', data: poisson, type: 'line', borderColor: 'red', borderWidth: 2, fill:false, tension:0.2 }
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins:{ legend:{ position:'top' }},
+      scales:{ y:{ title:{ display:true, text:'Probability' }}, x:{ title:{ display:true, text:'Count (N(1))' }}}
+    }
   });
 
-  const maxF = Math.max(...freq);
-  const barWidth = canvas.width / bins;
+  // summary
+  const meanEmp = counts.reduce((a,b)=>a+b,0)/counts.length;
+  const varEmp = counts.reduce((a,b)=>a + (b-meanEmp)**2, 0)/counts.length;
+  document.getElementById('distSummary').innerHTML =
+    `Simulated ${trials} realizations. Empirical mean = ${meanEmp.toFixed(3)}, variance = ${varEmp.toFixed(3)}; Theoretical mean & var = λ = ${parseFloat(document.getElementById('lambda').value).toFixed(3)}.`;
+}
 
-  for (let i = 0; i < bins; i++) {
-    const h = freq[i] / maxF * canvas.height;
-    ctx.fillStyle = "#0b3b3b";
-    ctx.fillRect(i * barWidth, canvas.height - h, barWidth - 2, h);
-  }
+/* Drawing functions */
+function drawCumChart(cumCounts, dt, lambda){
+  const labels = cumCounts.map((_,i) => (i*dt).toFixed(4));
+  const ctx = document.getElementById('cumChart').getContext('2d');
+  if(cumChart) cumChart.destroy();
+  cumChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{ label:'Cumulative count', data:cumCounts, borderColor:'#0b4cc2', borderWidth:2, pointRadius:0 }]
+    },
+    options: {
+      responsive:true,
+      plugins:{ legend:{ display:false }},
+      scales:{ x:{ title:{ display:true, text:'Time (t)' }}, y:{ title:{ display:true, text:'N(t)' }}}
+    }
+  });
+}
+
+function drawEventHistogram(eventTimes, lambda){
+  const bins = 30;
+  const freq = Array(bins).fill(0);
+  eventTimes.forEach(t => {
+    let b = Math.floor(t * bins);
+    if(b >= bins) b = bins - 1;
+    freq[b]++;
+  });
+  // normalize to density (so overlays are comparable)
+  const total = eventTimes.length || 1;
+  const dens = freq.map(f => f / (total * (1/bins)));
+
+  // prepare labels and poisson pmf overlay for counts per bin expected value
+  const labels = Array.from({length:bins}, (_,i) => ((i+0.5)/bins).toFixed(2));
+  const ctx = document.getElementById('histChart').getContext('2d');
+  if(histChart) histChart.destroy();
+
+  // theoretical rate per bin = lambda * (1/bins)
+  const lambdaBin = lambda / bins;
+  // approximate PMF for small intervals: probability of at least one event ~ lambdaBin (Poisson with small mean)
+  const theoHeights = Array(bins).fill(lambdaBin); // not normalized to density; we'll scale for visual overlay
+  // We will scale theoHeights to roughly match histogram scale for visual comparison:
+  const maxD = Math.max(...dens, 0.0001);
+  const scale = maxD / Math.max(...theoHeights, 1e-9);
+
+  histChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Event count (per bin)', data: freq, backgroundColor:'#60a5fa' },
+        { label:'Theoretical λ/bin (scaled)', data: theoHeights.map(h => h*total*scale), type:'line', borderColor:'red', borderWidth:2, fill:false, tension:0.2 }
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins:{ legend:{ position:'top' }},
+      scales:{ y:{ title:{ display:true, text:'Count' }}, x:{ title:{ display:true, text:'Time (bin center)' }}}
+    }
+  });
 }
 </script>
-
-<footer>© 2025 Shefik Memedi — Cybersecurity Statistics Blog</footer>
-</div>
 </body>
 </html>
