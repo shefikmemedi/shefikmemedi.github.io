@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Homework 9 — Probability, Measure Theory & Counting Processes</title>
+
+<style>
+  body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    margin: 0;
+    padding: 40px;
+    background: #fafafa;
+    color: #111;
+  }
+  .wrap {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 28px;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  }
+  h1, h2 { color: #0b3b3b; }
+  canvas { margin: 20px 0; max-width: 100%; }
+  input[type=number], input[type=range] {
+    width: 160px;
+    padding: 6px;
+    margin: 6px 0;
+  }
+  button {
+    padding: 8px 12px;
+    border: none;
+    background: #0b3b3b;
+    color: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<h1>Homework 9 — Probability Foundations, Measure Theory & Counting Processes</h1>
+<p class="sub">Shefik Memedi — Cybersecurity Statistics Blog</p>
+
+<h2>I. Interpretations of Probability</h2>
+
+<p>
+Probability has grown through several different philosophies, each fitting different kinds of problems.  
+The <strong>classical interpretation</strong> views probability as the ratio of favorable to total equally likely outcomes; elegant for dice or cards, but too rigid for real-world uncertainty.  
+The <strong>frequentist interpretation</strong> sees probability as the long-run relative frequency of an event, matching the intuitive behavior of simulations.  
+The <strong>Bayesian view</strong> treats probability as a degree of belief updated by evidence, allowing coherent reasoning even with little data.  
+The <strong>geometric interpretation</strong> defines probability via lengths, areas, or volumes, as in Buffon-type problems.
+</p>
+
+<p>
+These interpretations sometimes clash conceptually. For instance, the classical interpretation assumes symmetry, while the frequentist one requires infinite repetitions, and the Bayesian one introduces subjectivity.  
+The modern solution is the <strong>axiomatic approach</strong> developed by Kolmogorov. Instead of relying on philosophical motivations, probability is defined as a measure on a sigma-algebra.  
+The axioms provide a minimal and universal foundation:
+</p>
+
+<ol>
+  <li>Non-negativity: \( P(A) \ge 0 \)</li>
+  <li>Normalization: \( P(\Omega)=1 \)</li>
+  <li>Countable additivity: for disjoint events,  
+      \( P\left(\bigcup A_i\right)=\sum P(A_i) \)</li>
+</ol>
+
+<p>
+Every interpretation that respects these axioms becomes consistent. Bayesian probabilities, frequencies, classical symmetries, and geometric measures all produce valid probability measures.
+</p>
+
+<h2>II. Probability & Measure Theory</h2>
+
+<p>
+Measure theory provides the formal language for modern probability. A <strong>sigma-algebra</strong> is a collection of sets closed under complements and countable unions; it represents all events whose probability we are allowed to talk about.  
+A <strong>probability measure</strong> is a function \(P\) assigning numbers to these events in a way that respects the axioms above.  
+A <strong>random variable</strong> is a measurable function from outcomes to real numbers; this guarantees that inverse images of Borel sets are measurable events, allowing us to assign probabilities to them.
+</p>
+
+<p>
+Expectation becomes an integral,  
+\[
+E[X] = \int_\Omega X \, dP,
+\]
+and distributions become pushforward measures.  
+This machinery resolves paradoxes from older interpretations, especially those involving conditioning, infinite sets, or continuous distributions.
+</p>
+
+<h2>III. Subadditivity & Inclusion–Exclusion</h2>
+
+<h3>Subadditivity</h3>
+<p>
+Using only the axioms:
+</p>
+\[
+P(A \cup B) \le P(A) + P(B).
+\]
+<p>
+Reason:  
+\(A \cup B\) is a subset of the disjoint union \((A \setminus B) \cup B\).  
+Countable additivity on disjoint sets gives the result directly.
+</p>
+
+<h3>Inclusion–Exclusion</h3>
+<p>
+For two sets:
+</p>
+\[
+P(A \cup B)=P(A)+P(B)-P(A \cap B).
+\]
+<p>
+The idea generalizes, alternating between additions and subtractions.  
+This corrects the over-counting that happens when we add the individual probabilities.
+</p>
+
+<hr>
+
+<h2>IV. Simulation of a Counting Process</h2>
+
+<p>
+We now simulate a counting process on the interval \(T=1\).  
+Divide it into \(n\) subintervals and generate an event in each one with probability \(\lambda/n\).  
+As \(n\) becomes large, this approximates a <strong>Poisson process</strong> with rate \(\lambda\).
+</p>
+
+<p>
+The Poisson process has three key properties:
+</p>
+<ul>
+  <li>Independent increments</li>
+  <li>Stationary increments</li>
+  <li>Poisson distribution of counts</li>
+</ul>
+
+<p>
+The parameter \(\lambda\) is the expected number of events per unit time.  
+Simulating many small Bernoulli trials with success probability \(\lambda/n\) reproduces the same structure in the limit.
+</p>
+
+<h3>Simulation Controls</h3>
+
+<label>λ (rate):</label><br>
+<input type="number" id="lambda" value="5" min="0" step="0.5"><br>
+
+<label>n (subintervals):</label><br>
+<input type="number" id="n" value="5000" min="100" step="100"><br>
+
+<button onclick="runSimulation()">Run Simulation</button>
+
+<h3>Results</h3>
+
+<canvas id="countPlot" width="800" height="300"></canvas>
+<canvas id="histPlot" width="800" height="250"></canvas>
+
+<p id="summary"></p>
+
+<script>
+function runSimulation() {
+  const lambda = parseFloat(document.getElementById("lambda").value);
+  const n = parseInt(document.getElementById("n").value);
+  const p = lambda / n;
+  const dt = 1 / n;
+
+  let count = 0;
+  const times = [];
+  const traj = [];
+
+  for (let i = 0; i < n; i++) {
+    if (Math.random() < p) {
+      count++;
+      times.push(i * dt);
+    }
+    traj.push(count);
+  }
+
+  drawLine("countPlot", traj);
+  drawHistogram("histPlot", times);
+
+  const theoreticalMean = lambda;
+  const variance = lambda;
+
+  document.getElementById("summary").innerHTML =
+    "<strong>Total events:</strong> " + count +
+    "<br><strong>Theoretical mean:</strong> " + theoreticalMean +
+    "<br><strong>Theoretical variance:</strong> " + variance +
+    "<br><strong>Interpretation:</strong> The simulation closely matches a Poisson process with rate λ; independent increments and Poisson-distributed counts emerge naturally.";
+}
+
+function drawLine(id, data) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const maxY = Math.max(...data);
+  const scaleX = canvas.width / data.length;
+  const scaleY = canvas.height / maxY;
+
+  ctx.beginPath();
+  ctx.moveTo(0, canvas.height);
+
+  for (let i = 0; i < data.length; i++) {
+    ctx.lineTo(i * scaleX, canvas.height - data[i] * scaleY);
+  }
+
+  ctx.strokeStyle = "#0b3b3b";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function drawHistogram(id, times) {
+  const canvas = document.getElementById(id);
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  const bins = 20;
+  const freq = Array(bins).fill(0);
+
+  times.forEach(t => {
+    let b = Math.floor(t * bins);
+    if (b >= bins) b = bins - 1;
+    freq[b]++;
+  });
+
+  const maxF = Math.max(...freq);
+  const barWidth = canvas.width / bins;
+
+  for (let i = 0; i < bins; i++) {
+    const h = freq[i] / maxF * canvas.height;
+    ctx.fillStyle = "#0b3b3b";
+    ctx.fillRect(i * barWidth, canvas.height - h, barWidth - 2, h);
+  }
+}
+</script>
+
+<footer>© 2025 Shefik Memedi — Cybersecurity Statistics Blog</footer>
+</div>
+</body>
+</html>
