@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Homework 10 — Counting Process Simulation & Poisson Approximation — Shefik Memedi 2226852</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- MathJax -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async
+    src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    :root{
+      --bg:#fafafa; --card:#fff; --accent:#0b4cc2; --muted:#667;
+      --mono: "Fira Code", monospace;
+    }
+    body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:#111;margin:0;line-height:1.6;}
+    header{background:#0f172a;color:#fff;text-align:center;padding:2.2rem 1rem;}
+    header h1{margin:0;font-size:1.6rem;}
+    header p{margin:.4rem 0 0;color:#cfd9e6;}
+    main{max-width:920px;margin:2rem auto;background:var(--card);padding:1.6rem 1.8rem;border-radius:12px;box-shadow:0 8px 30px rgba(7,10,15,0.06)}
+    h2{color:var(--accent);margin-top:1.2rem}
+    .controls{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    label{font-size:0.95rem;color:#0b3b3b}
+    input[type=number]{padding:6px 8px;border-radius:6px;border:1px solid #e1e8f0;width:120px}
+    button{background:var(--accent);color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer}
+    button.secondary{background:#334155}
+    .grid{display:grid;grid-template-columns:1fr;gap:18px}
+    @media(min-width:980px){.grid{grid-template-columns:1fr 420px}}
+    .chart-card{background:#fff;padding:10px;border-radius:10px;border:1px solid #eef2f7}
+    pre{background:#f4f6f9;padding:12px;border-radius:8px;overflow:auto;font-family:var(--mono);font-size:0.95rem}
+    .muted{color:var(--muted);font-size:0.95rem}
+    footer{text-align:center;color:var(--muted);padding:1.2rem 0;font-size:0.9rem}
+    .stats{margin-top:8px;font-weight:600}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Homework 10 — Counting Process Simulation & Poisson Approximation</h1>
+    <p>Shefik Memedi — Cybersecurity Statistics Blog — 2226852</p>
+  </header>
+
+  <main>
+    <section>
+      <h2>Task & Plan</h2>
+      <p>
+        Simulate a counting process on the interval \(T=1\) where events occur independently and uniformly in time at a constant average rate \(\lambda\).
+        Approximate it by dividing the interval into \(n\) subintervals and generating an event in each with probability \(\lambda/n\).
+        Analyze which stochastic process this approximates, list its properties, and interpret \(\lambda\).
+      </p>
+    </section>
+
+    <section>
+      <h2>I. Quick theoretical recap</h2>
+      <p>
+        The Bernoulli-subinterval construction yields, in the limit \(n\to\infty\), a <strong>Poisson process</strong> \(N(t)\) of rate \(\lambda\). For \(t>0\):
+      </p>
+      <p style="text-align:center">
+        \(\displaystyle P\big(N(t)=k\big)=\frac{(\lambda t)^k e^{-\lambda t}}{k!},\)
+      </p>
+      <p>
+        increments are independent and stationary; interarrival times are i.i.d. exponential with parameter \(\lambda\), i.e.
+      </p>
+      <p style="text-align:center">
+        \(\displaystyle f_{S}(s)=\lambda e^{-\lambda s},\quad s\ge0.\)
+      </p>
+      <p class="muted">
+        Intuition: \(\lambda\) is the average number of events per unit time (mean and variance of \(N(1)\) are both \(\lambda\)). In cybersecurity, \(\lambda\) could represent average alerts per day or intrusion attempts per week.
+      </p>
+    </section>
+
+    <section>
+      <h2>II. Simulation methods (implemented)</h2>
+      <p>
+        This page provides two simulation approaches so you can compare them:
+      </p>
+      <ol>
+        <li><strong>Bernoulli-subinterval approximation</strong>: divide \([0,1]\) into \(n\) equal subintervals and perform independent Bernoulli trials with probability \(p=\lambda/n\). Counts approximate Poisson.</li>
+        <li><strong>Direct Poisson process</strong>: simulate interarrival times \(S_i\sim \mathrm{Exp}(\lambda)\) and accumulate until \(T\). This generates exact Poisson process realizations (modulo RNG).</li>
+      </ol>
+    </section>
+
+    <section>
+      <h3>Simulation controls</h3>
+      <div class="controls">
+        <div>
+          <label>λ (rate)</label><br>
+          <input id="lambda" type="number" value="5" min="0" step="0.5">
+        </div>
+
+        <div>
+          <label>n (subintervals)</label><br>
+          <input id="n" type="number" value="5000" min="200" step="200">
+        </div>
+
+        <div>
+          <label># realizations (many sims)</label><br>
+          <input id="reps" type="number" value="1200" min="100" max="5000" step="100">
+        </div>
+
+        <div style="align-self:end">
+          <button onclick="runOnce()">Run single (both methods)</button>
+          <button class="secondary" onclick="runMany()">Run many (empirical counts)</button>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-top:12px" class="grid">
+      <div>
+        <div class="chart-card">
+          <h3 style="margin:6px 0">Cumulative count (single realization)</h3>
+          <canvas id="cumCanvas" height="220"></canvas>
+          <div id="singleSummary" class="muted stats"></div>
+        </div>
+
+        <div class="chart-card" style="margin-top:14px">
+          <h3 style="margin:6px 0">Interarrival times (direct Poisson) — empirical vs Exponential(\(\lambda\))</h3>
+          <canvas id="iaCanvas" height="220"></canvas>
+          <div id="iaSummary" class="muted stats"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="chart-card">
+          <h3 style="margin:6px 0">Event-time histogram (Bernoulli-subinterval)</h3>
+          <canvas id="timeHist" height="220"></canvas>
+          <div id="timeSummary" class="muted stats"></div>
+        </div>
+
+        <div class="chart-card" style="margin-top:14px">
+          <h3 style="margin:6px 0">Distribution of counts (many realizations)</h3>
+          <canvas id="countCanvas" height="220"></canvas>
+          <div id="countSummary" class="muted stats"></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="margin-top:14px">
+      <h2>III. How the code compares the two methods</h2>
+      <p class="muted">
+        The Bernoulli-subinterval method approximates Poisson counts (Binomial \(\to\) Poisson limit). The direct method samples exponential interarrivals and is exact; comparing both demonstrates convergence and shows interarrival exponentiality and Poisson counts empirically.
+      </p>
+    </section>
+
+    <section style="margin-top:12px">
+      <h2>IV. Run notes</h2>
+      <p class="muted">Use the single-run button to inspect one trajectory (both methods plotted). Use "Run many" to produce the empirical distribution of counts (N(1)) across many realizations and compare with the Poisson(\(\lambda\)) PMF.</p>
+    </section>
+  </main>
+
+  <footer>© 2025 Shefik Memedi — Cybersecurity Statistics Blog</footer>
+
+<script>
+/* Helpers */
+function factorial(k){ if(k<=1) return 1; let r=1; for(let i=2;i<=k;i++) r*=i; return r; }
+function poissonPMF(k, lambda){ return Math.exp(-lambda)*Math.pow(lambda,k)/factorial(k); }
+function exponentialSample(lambda){
+  // Inverse CDF: -ln(U)/lambda
+  const u = Math.random();
+  return -Math.log(1 - u) / lambda;
+}
+
+/* Chart holders */
+let cumChart=null, timeHistChart=null, countChart=null, iaChart=null;
+
+/* Run single realization: both methods */
+function runOnce(){
+  const lambda = parseFloat(document.getElementById('lambda').value);
+  let n = parseInt(document.getElementById('n').value); if(n<200) n=200;
+  const p = Math.min(1, lambda / n);
+  const dt = 1 / n;
+
+  // 1) Bernoulli-subinterval method
+  const cumB = [0];
+  const eventTimesB = [];
+  let countB = 0;
+  for(let i=0;i<n;i++){
+    if(Math.random() < p){
+      countB++;
+      eventTimesB.push((i + 0.5) * dt);
+    }
+    cumB.push(countB);
+  }
+
+  // 2) Direct Poisson via exponential interarrival
+  const cumP = [0];
+  const eventTimesP = [];
+  let t=0, countP=0;
+  while(true){
+    const s = exponentialSample(lambda);
+    t += s;
+    if(t>1) break;
+    countP++;
+    eventTimesP.push(t);
+  }
+  // build cumP at same sampling grid as bernoulli (n+1 points)
+  let idxP = 0;
+  for(let i=0;i<=n;i++){
+    const currentT = i*dt;
+    while(idxP < eventTimesP.length && eventTimesP[idxP] <= currentT + 1e-12) idxP++;
+    cumP[i] = idxP;
+  }
+
+  drawCumChart(cumB, cumP, dt);
+  drawTimeHistogram(eventTimesB, eventTimesP, n);
+  drawIAHistogram(eventTimesP, lambda);
+
+  document.getElementById('singleSummary').innerHTML =
+    `Bernoulli events: <strong>${countB}</strong> — Poisson exact events: <strong>${countP}</strong> — λ=${lambda}`;
+
+}
+
+/* Run many realizations (Bernoulli-subinterval) to get empirical counts distribution */
+function runMany(){
+  const lambda = parseFloat(document.getElementById('lambda').value);
+  let n = parseInt(document.getElementById('n').value); if(n<200) n=200;
+  const p = Math.min(1, lambda / n);
+  const reps = Math.min(5000, Math.max(100, parseInt(document.getElementById('reps').value)));
+  const counts = new Array(reps).fill(0);
+
+  for(let r=0;r<reps;r++){
+    let c=0;
+    for(let i=0;i<n;i++) if(Math.random() < p) c++;
+    counts[r]=c;
+  }
+
+  // empirical histogram of counts
+  const maxC = Math.max(...counts);
+  const bins = Array(maxC+1).fill(0);
+  counts.forEach(v => bins[v]++);
+  const probs = bins.map(b => b / reps);
+
+  // theoretical Poisson probs up to maxC
+  const poisson = [];
+  for(let k=0;k<=maxC;k++) poisson.push(poissonPMF(k, lambda));
+
+  // draw count distribution chart
+  const ctx = document.getElementById('countCanvas').getContext('2d');
+  if(countChart) countChart.destroy();
+  countChart = new Chart(ctx, {
+    type:'bar',
+    data: {
+      labels: bins.map((_,i)=>String(i)),
+      datasets: [
+        { label:'Empirical freq', data: probs, backgroundColor:'#60a5fa' },
+        { label:'Poisson PMF', data: poisson, type:'line', borderColor:'red', borderWidth:2, fill:false, tension:0.2 }
+      ]
+    },
+    options:{ responsive:true, plugins:{ legend:{ position:'top' } }, scales:{ y:{ title:{ display:true, text:'Probability' }}, x:{ title:{ display:true, text:'Counts (N(1))' }}} }
+  });
+
+  // summary
+  const meanEmp = counts.reduce((a,b)=>a+b,0)/counts.length;
+  const varEmp = counts.reduce((a,b)=>a + (b-meanEmp)**2, 0)/counts.length;
+
+  document.getElementById('countSummary').innerText =
+    `Simulated ${reps} realizations. Empirical mean=${meanEmp.toFixed(3)}, variance=${varEmp.toFixed(3)}; Theoretical mean & var = λ = ${lambda}.`;
+}
+
+/* Drawing functions */
+function drawCumChart(cumB, cumP, dt){
+  const labels = cumB.map((_,i)=> (i*dt).toFixed(3));
+  const ctx = document.getElementById('cumCanvas').getContext('2d');
+  if(cumChart) cumChart.destroy();
+  cumChart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels,
+      datasets:[
+        { label:'Bernoulli-subinterval N(t)', data:cumB, borderColor:'#0b4cc2', borderWidth:2, pointRadius:0 },
+        { label:'Direct Poisson N(t)', data:cumP, borderColor:'#f97316', borderWidth:2, pointRadius:0 }
+      ]
+    },
+    options:{ responsive:true, plugins:{ legend:{ position:'top' } }, scales:{ x:{ title:{ display:true, text:'Time (t)' }}, y:{ title:{ display:true, text:'N(t)' }}} }
+  });
+}
+
+function drawTimeHistogram(eventTimesB, eventTimesP, n){
+  const bins = 30;
+  const freqB = Array(bins).fill(0);
+  const freqP = Array(bins).fill(0);
+  eventTimesB.forEach(t => { let b=Math.floor(t*bins); if(b>=bins) b=bins-1; freqB[b]++; });
+  eventTimesP.forEach(t => { let b=Math.floor(t*bins); if(b>=bins) b=bins-1; freqP[b]++; });
+
+  const ctx = document.getElementById('timeHist').getContext('2d');
+  if(timeHistChart) timeHistChart.destroy();
+  const labels = Array.from({length:bins}, (_,i)=> ((i+0.5)/bins).toFixed(2));
+  timeHistChart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        { label:'Bernoulli counts (per bin)', data:freqB, backgroundColor:'rgba(96,165,250,0.9)' },
+        { label:'Direct Poisson counts (per bin)', data:freqP, backgroundColor:'rgba(249,115,22,0.7)' }
+      ]
+    },
+    options:{ responsive:true, plugins:{ legend:{ position:'top' } }, scales:{ x:{ title:{ display:true, text:'Time (bin center)' }}, y:{ title:{ display:true, text:'Count' }}} }
+  });
+
+  document.getElementById('timeSummary').innerText =
+    `Bernoulli events: ${eventTimesB.length}, Direct Poisson events: ${eventTimesP.length}`;
+}
+
+function drawIAHistogram(eventTimesP, lambda){
+  // compute interarrivals
+  const ia = [];
+  for(let i=0;i<eventTimesP.length;i++){
+    if(i===0) ia.push(eventTimesP[0]); else ia.push(eventTimesP[i]-eventTimesP[i-1]);
+  }
+  // bins
+  const bins = 30;
+  const freq = Array(bins).fill(0);
+  ia.forEach(v => { let b = Math.floor(v * bins / Math.max(0.0001, Math.max(...ia))); if(b>=bins) b=bins-1; freq[b]++; });
+
+  // prepare exponential density overlay
+  const maxIA = Math.max(...ia, 0.0001);
+  const xs = Array.from({length:100}, (_,i)=> i/100 * Math.max(maxIA, 3/lambda));
+  const expo = xs.map(x => lambda * Math.exp(-lambda * x));
+
+  const ctx = document.getElementById('iaCanvas').getContext('2d');
+  if(iaChart) iaChart.destroy();
+  iaChart = new Chart(ctx, {
+    type:'bar',
+    data:{
+      labels: Array.from({length:bins}, (_,i)=> (i/bins*maxIA).toFixed(3)),
+      datasets:[
+        { label:'Interarrival counts', data:freq, backgroundColor:'#60a5fa' },
+        // we will scale expo to match histogram visually (approx)
+        { label:'Exponential PDF (scaled)', data: xs.map((_,i)=> expo[i] * ia.length * (maxIA/bins) ), type:'line', borderColor:'red', borderWidth:2, fill:false, tension:0.2 }
+      ]
+    },
+    options:{ responsive:true, plugins:{ legend:{ position:'top' } }, scales:{ x:{ title:{ display:true, text:'Interarrival length' }}, y:{ title:{ display:true, text:'Count' }}} }
+  });
+
+  // summary
+  const meanIA = ia.length ? ia.reduce((a,b)=>a+b,0)/ia.length : 0;
+  document.getElementById('iaSummary').innerText = `Interarrival mean ≈ ${meanIA.toFixed(3)} (theoretical = 1/λ = ${(1/parseFloat(document.getElementById('lambda').value)).toFixed(3)})`;
+}
+</script>
+</body>
+</html>
