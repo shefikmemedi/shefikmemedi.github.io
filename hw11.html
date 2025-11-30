@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HW 11: Wiener Process (Brownian Motion)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* Navigation Links Styling */
+        .nav-links { margin-bottom: 20px; font-size: 0.9em; }
+        .nav-links a { text-decoration: none; color: #3498db; margin-right: 15px; font-weight: bold; }
+        .nav-links a:hover { text-decoration: underline; color: #2980b9; }
+
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; background: #ecf0f1; padding: 20px; border-radius: 8px; }
+        .control-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
+        .control-group input { width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box; }
+        button { grid-column: 1 / -1; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+        button:hover { background-color: #2980b9; }
+        .charts-area { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        canvas { background: #fff; border: 1px solid #eee; border-radius: 4px; }
+        .stats-panel { margin-top: 20px; padding: 15px; background-color: #e8f6f3; border-left: 5px solid #1abc9c; border-radius: 4px; }
+        .theory-section { margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; }
+        .latex { font-family: "Times New Roman", serif; font-style: italic; }
+        code { background: #eee; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-links">
+        <a href="index.html">← Back to Index</a>
+        <a href="homework10.html">← Previous: Homework 10</a>
+    </div>
+
+    <h1>Homework 11: Wiener Process Simulation</h1>
+    <p>Simulating the standard Brownian Motion $W(t)$ using the Box-Muller transformation to generate normal increments.</p>
+
+    <div class="controls">
+        <div class="control-group">
+            <label for="timeHorizon">Time Horizon ($T$)</label>
+            <input type="number" id="timeHorizon" value="1" step="0.1">
+        </div>
+        <div class="control-group">
+            <label for="steps">Steps ($n$)</label>
+            <input type="number" id="steps" value="1000">
+        </div>
+        <div class="control-group">
+            <label for="numPaths">Simulations ($m$)</label>
+            <input type="number" id="numPaths" value="100">
+        </div>
+        <div class="control-group">
+            <label for="sigma">Diffusion ($\sigma$)</label>
+            <input type="number" id="sigma" value="1" step="0.1">
+        </div>
+        <button onclick="runSimulation()">Run Brownian Simulation</button>
+    </div>
+
+    <div class="stats-panel" id="statsOutput">
+        <strong>Statistics (at time $T$):</strong> Run the simulation to see results.
+    </div>
+
+    <div class="charts-area">
+        <div>
+            <h3>Sample Paths (Wiener Process)</h3>
+            <canvas id="pathsChart"></canvas>
+        </div>
+        <div>
+            <h3>Distribution of Final Positions ($W_T$)</h3>
+            <canvas id="histoChart"></canvas>
+        </div>
+    </div>
+
+    <div class="theory-section">
+        <h3>Theoretical Background</h3>
+        <p>This simulation approximates the <strong>Wiener Process</strong> (Standard Brownian Motion) using a discrete random walk with continuous state space.</p>
+        
+        <h4>1. The Mathematical Model</h4>
+        <p>The process is defined by the stochastic differential equation (SDE) approximation:</p>
+        <p style="text-align: center; font-size: 1.2em;">
+            $W_{t+dt} = W_t + \sigma \sqrt{dt} \cdot Z$
+        </p>
+        <p>Where:</p>
+        <ul>
+            <li>$dt = T/n$ is the time increment.</li>
+            <li>$Z \sim N(0, 1)$ is a standard normal random variable.</li>
+            <li>$\sqrt{dt}$ is the scaling factor required because variance scales linearly with time ($Var(W_t) = t$).</li>
+        </ul>
+
+        <h4>2. The Box-Muller Transform</h4>
+        <p>To generate the "Normal Jumps" ($Z$) from standard Uniform random numbers ($u_1, u_2 \sim U(0,1)$), we utilize the Box-Muller algorithm:</p>
+        <p><code>Z = sqrt(-2 * ln(u1)) * cos(2 * pi * u2)</code></p>
+    </div>
+</div>
+
+<script>
+    let pathsChartInstance = null;
+    let histoChartInstance = null;
+
+    // --- 1. The Box-Muller Generator ---
+    // Returns a Standard Normal number N(0,1)
+    function boxMullerTransform() {
+        let u1 = 0, u2 = 0;
+        // Avoid 0 for log calculation
+        while(u1 === 0) u1 = Math.random(); 
+        u2 = Math.random();
+        
+        const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+        return z;
+    }
+
+    function runSimulation() {
+        // --- 2. Gather Inputs ---
+        const T = parseFloat(document.getElementById('timeHorizon').value);
+        const n = parseInt(document.getElementById('steps').value);
+        const m = parseInt(document.getElementById('numPaths').value);
+        const sigma = parseFloat(document.getElementById('sigma').value);
+
+        const dt = T / n;
+        const sqrt_dt = Math.sqrt(dt);
+
+        // --- 3. Simulation Logic ---
+        const trajectories = []; // Array of arrays (paths)
+        const finalPositions = []; // Array of W(T)
+        const timeLabels = [];
+
+        // Generate Time Labels (X-Axis)
+        for (let i = 0; i <= n; i++) {
+            // Only add label every few steps to save memory for charts if n is huge
+            if (n > 200 && i % Math.floor(n/20) !== 0) continue; 
+            timeLabels.push((i * dt).toFixed(2));
+        }
+
+        // Loop for m trajectories
+        for (let path = 0; path < m; path++) {
+            let W = 0;
+            const singlePath = [0]; // Start at 0
+
+            for (let step = 1; step <= n; step++) {
+                // The core update rule using Box-Muller
+                const Z = boxMullerTransform();
+                const dW = sigma * sqrt_dt * Z;
+                W += dW;
+                
+                // Downsampling for visual performance if needed
+                if (n <= 200 || step % Math.floor(n/20) === 0) {
+                    singlePath.push(W);
+                }
+            }
+            trajectories.push(singlePath);
+            finalPositions.push(W);
+        }
+
+        // --- 4. Statistics ---
+        const mean = finalPositions.reduce((a, b) => a + b, 0) / m;
+        const variance = finalPositions.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / m;
+        const theoreticalVar = Math.pow(sigma, 2) * T;
+
+        document.getElementById('statsOutput').innerHTML = `
+            <strong>Simulation Results (t=${T}):</strong><br>
+            Empirical Mean: ${mean.toFixed(4)} (Theoretical: 0.00)<br>
+            Empirical Variance: ${variance.toFixed(4)} (Theoretical: ${theoreticalVar.toFixed(4)})<br>
+            <i>Note: As $m \\to \\infty$, Empirical Variance converges to $T$.</i>
+        `;
+
+        // --- 5. Charting ---
+        drawPathsChart(timeLabels, trajectories);
+        drawHistogram(finalPositions, sigma, T);
+    }
+
+    function drawPathsChart(labels, dataSets) {
+        const ctx = document.getElementById('pathsChart').getContext('2d');
+        
+        // Transform data for Chart.js
+        // Limiting to drawing first 50 paths to prevent browser crash if m is huge
+        const pathsToDraw = dataSets.slice(0, 50).map((pathData, index) => ({
+            label: `Path ${index + 1}`,
+            data: pathData,
+            borderColor: `rgba(52, 152, 219, ${0.4 + (Math.random() * 0.4)})`, // Varying blues
+            borderWidth: 1,
+            pointRadius: 0,
+            fill: false
+        }));
+
+        if (pathsChartInstance) pathsChartInstance.destroy();
+
+        pathsChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels, // X-axis
+                datasets: pathsToDraw
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false }, title: { display: true, text: 'First 50 Trajectories' } },
+                scales: { 
+                    x: { title: { display: true, text: 'Time (t)' } },
+                    y: { title: { display: true, text: 'Value W(t)' } }
+                }
+            }
+        });
+    }
+
+    function drawHistogram(data, sigma, T) {
+        const ctx = document.getElementById('histoChart').getContext('2d');
+        
+        // Create bins
+        const binCount = 20;
+        const min = Math.min(...data);
+        const max = Math.max(...data);
+        const range = max - min;
+        const interval = range / binCount;
+        
+        const bins = new Array(binCount).fill(0);
+        const binLabels = [];
+        
+        for (let i = 0; i < binCount; i++) {
+            const binStart = min + (i * interval);
+            const binEnd = min + ((i + 1) * interval);
+            binLabels.push(((binStart + binEnd) / 2).toFixed(2));
+        }
+
+        data.forEach(val => {
+            const index = Math.min(Math.floor((val - min) / interval), binCount - 1);
+            bins[index]++;
+        });
+
+        // Generate Theoretical Normal Curve Points for comparison
+        const theoreticalData = binLabels.map(x => {
+            const xVal = parseFloat(x);
+            // PDF of N(0, T*sigma^2)
+            const variance = Math.pow(sigma, 2) * T;
+            const sd = Math.sqrt(variance);
+            const pdf = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow(xVal / sd, 2));
+            // Scale PDF to match histogram count
+            return pdf * data.length * interval; 
+        });
+
+        if (histoChartInstance) histoChartInstance.destroy();
+
+        histoChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: binLabels,
+                datasets: [
+                    {
+                        label: 'Observed Frequency',
+                        data: bins,
+                        backgroundColor: 'rgba(26, 188, 156, 0.6)',
+                        borderColor: 'rgba(26, 188, 156, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        type: 'line',
+                        label: `Theoretical N(0, ${T})`,
+                        data: theoreticalData,
+                        borderColor: '#e74c3c',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: { title: { display: true, text: `Distribution at T=${T}` } },
+                scales: { 
+                    x: { title: { display: true, text: 'Final Position' } },
+                    y: { title: { display: true, text: 'Frequency' } }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
