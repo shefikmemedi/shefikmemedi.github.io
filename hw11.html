@@ -14,8 +14,9 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f8; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        /* CLEAN LIGHT THEME */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
         
         /* Navigation Links Styling */
         .nav-links { margin-bottom: 20px; font-size: 0.9em; }
@@ -23,15 +24,20 @@
         .nav-links a:hover { text-decoration: underline; color: #2980b9; }
 
         h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; background: #ecf0f1; padding: 20px; border-radius: 8px; }
-        .control-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; }
-        .control-group input { width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box; }
-        button { grid-column: 1 / -1; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background 0.3s; }
+        
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; background: #f1f3f5; padding: 20px; border-radius: 8px; }
+        .control-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555; }
+        .control-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        button { grid-column: 1 / -1; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background 0.3s; font-weight: 600; }
         button:hover { background-color: #2980b9; }
-        .charts-area { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        
+        .charts-area { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 20px; }
         canvas { background: #fff; border: 1px solid #eee; border-radius: 4px; }
+        
         .stats-panel { margin-top: 20px; padding: 15px; background-color: #e8f6f3; border-left: 5px solid #1abc9c; border-radius: 4px; }
-        .theory-section { margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; }
+        
+        .theory-section { margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #444; }
         code { background: #eee; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
     </style>
 </head>
@@ -44,7 +50,7 @@
     </div>
 
     <h1>Homework 11: Wiener Process Simulation</h1>
-    <p>Simulating the standard Brownian Motion $W(t)$ using the Box-Muller transformation to generate normal increments.</p>
+    <p>Simulating the standard Brownian Motion $W(t)$ using the Box-Muller transformation.</p>
 
     <div class="controls">
         <div class="control-group">
@@ -94,7 +100,7 @@
         <ul>
             <li>$dt = T/n$ is the time increment.</li>
             <li>$Z \sim N(0, 1)$ is a standard normal random variable.</li>
-            <li>$\sqrt{dt}$ is the scaling factor required because variance scales linearly with time ($Var(W_t) = t$).</li>
+            <li>$\sqrt{dt}$ is the scaling factor because variance scales linearly with time ($Var(W_t) = t$).</li>
         </ul>
 
         <h4>2. The Box-Muller Transform</h4>
@@ -107,18 +113,14 @@
     let pathsChartInstance = null;
     let histoChartInstance = null;
 
-    // --- 1. The Box-Muller Generator ---
     function boxMullerTransform() {
         let u1 = 0, u2 = 0;
         while(u1 === 0) u1 = Math.random(); 
         u2 = Math.random();
-        
-        const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
-        return z;
+        return Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
     }
 
     function runSimulation() {
-        // --- 2. Gather Inputs ---
         const T = parseFloat(document.getElementById('timeHorizon').value);
         const n = parseInt(document.getElementById('steps').value);
         const m = parseInt(document.getElementById('numPaths').value);
@@ -127,18 +129,17 @@
         const dt = T / n;
         const sqrt_dt = Math.sqrt(dt);
 
-        // --- 3. Simulation Logic ---
         const trajectories = []; 
         const finalPositions = [];
         const timeLabels = [];
 
-        // Generate Time Labels (X-Axis)
+        // Generate Labels
         for (let i = 0; i <= n; i++) {
             if (n > 200 && i % Math.floor(n/20) !== 0) continue; 
             timeLabels.push((i * dt).toFixed(2));
         }
 
-        // Loop for m trajectories
+        // Generate Paths
         for (let path = 0; path < m; path++) {
             let W = 0;
             const singlePath = [0]; 
@@ -156,23 +157,20 @@
             finalPositions.push(W);
         }
 
-        // --- 4. Statistics ---
+        // Statistics
         const mean = finalPositions.reduce((a, b) => a + b, 0) / m;
         const variance = finalPositions.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / m;
         const theoreticalVar = Math.pow(sigma, 2) * T;
 
         const statsPanel = document.getElementById('statsOutput');
-        // We use MathJax.typesetPromise() to re-render formulas in the updated stats panel
         statsPanel.innerHTML = `
             <strong>Simulation Results (t=${T}):</strong><br>
             Empirical Mean: ${mean.toFixed(4)} (Theoretical: 0.00)<br>
             Empirical Variance: ${variance.toFixed(4)} (Theoretical: ${theoreticalVar.toFixed(4)})<br>
             <i>Note: As $m \\to \\infty$, Empirical Variance converges to $T$.</i>
         `;
-        // Trigger MathJax to render the new content
         if(window.MathJax) { window.MathJax.typesetPromise([statsPanel]); }
 
-        // --- 5. Charting ---
         drawPathsChart(timeLabels, trajectories);
         drawHistogram(finalPositions, sigma, T);
     }
@@ -180,13 +178,16 @@
     function drawPathsChart(labels, dataSets) {
         const ctx = document.getElementById('pathsChart').getContext('2d');
         
-        const pathsToDraw = dataSets.slice(0, 50).map((pathData, index) => ({
-            label: `Path ${index + 1}`,
+        // --- VISUAL FIX: Ghostly Lines ---
+        // We set opacity to 0.25 so overlaps create the "density" effect.
+        const pathsToDraw = dataSets.slice(0, 100).map((pathData) => ({
+            label: '',
             data: pathData,
-            borderColor: `rgba(52, 152, 219, ${0.4 + (Math.random() * 0.4)})`,
-            borderWidth: 1,
+            borderColor: 'rgba(52, 152, 219, 0.25)', // Fixed low opacity Blue
+            borderWidth: 1.5,
             pointRadius: 0,
-            fill: false
+            fill: false,
+            tension: 0.1 // Slight smoothing
         }));
 
         if (pathsChartInstance) pathsChartInstance.destroy();
@@ -197,7 +198,11 @@
             options: {
                 responsive: true,
                 interaction: { intersect: false },
-                plugins: { legend: { display: false }, title: { display: true, text: 'First 50 Trajectories' } },
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: { enabled: false }, // Disable tooltip for cleaner view
+                    title: { display: true, text: `Wiener Process (${dataSets.length} trajectories)` } 
+                },
                 scales: { 
                     x: { title: { display: true, text: 'Time (t)' } },
                     y: { title: { display: true, text: 'Value W(t)' } }
@@ -211,8 +216,7 @@
         const binCount = 20;
         const min = Math.min(...data);
         const max = Math.max(...data);
-        const range = max - min;
-        const interval = range / binCount;
+        const interval = (max - min) / binCount;
         
         const bins = new Array(binCount).fill(0);
         const binLabels = [];
@@ -248,7 +252,9 @@
                         data: bins,
                         backgroundColor: 'rgba(26, 188, 156, 0.6)',
                         borderColor: 'rgba(26, 188, 156, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        barPercentage: 1.0,
+                        categoryPercentage: 1.0
                     },
                     {
                         type: 'line',
