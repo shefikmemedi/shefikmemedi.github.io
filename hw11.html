@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HW 11: Wiener Process (Brownian Motion)</title>
+    <title>HW 11: Euler-Maruyama SDE Simulation</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
@@ -14,29 +14,34 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
     <style>
-        /* CLEAN LIGHT THEME */
+        /* CLEAN PROFESSIONAL THEME */
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee; }
         
-        /* Navigation Links Styling */
+        /* Navigation Links */
         .nav-links { margin-bottom: 20px; font-size: 0.9em; }
         .nav-links a { text-decoration: none; color: #3498db; margin-right: 15px; font-weight: bold; }
         .nav-links a:hover { text-decoration: underline; color: #2980b9; }
 
         h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 0; }
         
-        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 25px; background: #f1f3f5; padding: 20px; border-radius: 8px; }
+        /* Input Controls */
+        .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; background: #f1f3f5; padding: 20px; border-radius: 8px; }
         .control-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555; }
         .control-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
         
+        /* Run Button */
         button { grid-column: 1 / -1; padding: 12px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: background 0.3s; font-weight: 600; }
         button:hover { background-color: #2980b9; }
         
+        /* Charts Layout */
         .charts-area { display: grid; grid-template-columns: 1fr; gap: 30px; margin-top: 20px; }
         canvas { background: #fff; border: 1px solid #eee; border-radius: 4px; }
         
+        /* Stats Box */
         .stats-panel { margin-top: 20px; padding: 15px; background-color: #e8f6f3; border-left: 5px solid #1abc9c; border-radius: 4px; }
         
+        /* Theory Section */
         .theory-section { margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px; color: #444; }
         code { background: #eee; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
     </style>
@@ -49,12 +54,20 @@
         <a href="homework10.html">← Previous: Homework 10</a>
     </div>
 
-    <h1>Homework 11: Wiener Process Simulation</h1>
-    <p>Simulating the standard Brownian Motion $W(t)$ using the Box-Muller transformation.</p>
+    <h1>Homework 11: Euler-Maruyama SDE Simulation</h1>
+    <p>Simulating a Generalized Wiener Process (Brownian Motion with Drift) using the Euler-Maruyama numerical method.</p>
 
     <div class="controls">
         <div class="control-group">
-            <label for="timeHorizon">Time Horizon ($T$)</label>
+            <label for="mu">Drift ($\mu$)</label>
+            <input type="number" id="mu" value="0" step="0.1">
+        </div>
+        <div class="control-group">
+            <label for="sigma">Diffusion ($\sigma$)</label>
+            <input type="number" id="sigma" value="1" step="0.1">
+        </div>
+        <div class="control-group">
+            <label for="timeHorizon">Time ($T$)</label>
             <input type="number" id="timeHorizon" value="1" step="0.1">
         </div>
         <div class="control-group">
@@ -65,47 +78,39 @@
             <label for="numPaths">Simulations ($m$)</label>
             <input type="number" id="numPaths" value="100">
         </div>
-        <div class="control-group">
-            <label for="sigma">Diffusion ($\sigma$)</label>
-            <input type="number" id="sigma" value="1" step="0.1">
-        </div>
-        <button onclick="runSimulation()">Run Brownian Simulation</button>
+        <button onclick="runSimulation()">Run Simulation</button>
     </div>
 
     <div class="stats-panel" id="statsOutput">
-        <strong>Statistics (at time $T$):</strong> Run the simulation to see results.
+        <strong>Calculating...</strong>
     </div>
 
     <div class="charts-area">
         <div>
-            <h3>Sample Paths (Wiener Process)</h3>
+            <h3>Sample Paths (Process $X_t$)</h3>
             <canvas id="pathsChart"></canvas>
         </div>
         <div>
-            <h3>Distribution of Final Positions ($W_T$)</h3>
+            <h3>Distribution at Final Time $T$</h3>
             <canvas id="histoChart"></canvas>
         </div>
     </div>
 
     <div class="theory-section">
         <h3>Theoretical Background</h3>
-        <p>This simulation approximates the <strong>Wiener Process</strong> (Standard Brownian Motion) using a discrete random walk with continuous state space.</p>
-        
-        <h4>1. The Mathematical Model</h4>
-        <p>The process is defined by the stochastic differential equation (SDE) approximation:</p>
-        <p style="text-align: center; font-size: 1.3em;">
-            $$W_{t+dt} = W_t + \sigma \sqrt{dt} \cdot Z$$
+        <p>This homework generalizes the Random Walk (HW 7) to continuous time by solving the Stochastic Differential Equation (SDE):</p>
+        <p style="text-align: center; font-size: 1.2em;">
+            $$ dX_t = \mu dt + \sigma dW_t $$
         </p>
-        <p>Where:</p>
+        <p>Using the <strong>Euler-Maruyama</strong> discretization method:</p>
+        <p style="text-align: center; font-size: 1.1em;">
+            $$ X_{i+1} = X_i + \mu \Delta t + \sigma \sqrt{\Delta t} Z_i $$
+        </p>
+        <p>Where $Z_i \sim N(0,1)$ is a standard normal random variable generated via the <strong>Box-Muller transform</strong>.</p>
         <ul>
-            <li>$dt = T/n$ is the time increment.</li>
-            <li>$Z \sim N(0, 1)$ is a standard normal random variable.</li>
-            <li>$\sqrt{dt}$ is the scaling factor because variance scales linearly with time ($Var(W_t) = t$).</li>
+            <li>If $\mu = 0$ and $\sigma = 1$, this is a standard Wiener Process.</li>
+            <li>If $\mu \neq 0$, the process has a deterministic trend (drift).</li>
         </ul>
-
-        <h4>2. The Box-Muller Transform</h4>
-        <p>To generate the "Normal Jumps" ($Z$) from standard Uniform random numbers ($u_1, u_2 \sim U(0,1)$), we utilize the Box-Muller algorithm:</p>
-        <p>$$Z = \sqrt{-2 \ln(u_1)} \cos(2 \pi u_2)$$</p>
     </div>
 </div>
 
@@ -113,6 +118,7 @@
     let pathsChartInstance = null;
     let histoChartInstance = null;
 
+    // --- 1. Box-Muller Transform (Normal Random Generator) ---
     function boxMullerTransform() {
         let u1 = 0, u2 = 0;
         while(u1 === 0) u1 = Math.random(); 
@@ -120,10 +126,13 @@
         return Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
     }
 
+    // --- 2. Main Simulation Function ---
     function runSimulation() {
+        // Inputs
         const T = parseFloat(document.getElementById('timeHorizon').value);
         const n = parseInt(document.getElementById('steps').value);
         const m = parseInt(document.getElementById('numPaths').value);
+        const mu = parseFloat(document.getElementById('mu').value);
         const sigma = parseFloat(document.getElementById('sigma').value);
 
         const dt = T / n;
@@ -133,62 +142,74 @@
         const finalPositions = [];
         const timeLabels = [];
 
-        // Generate Labels
+        // Generate Time Axis Labels (Optimization: Don't label every single step if n is large)
         for (let i = 0; i <= n; i++) {
             if (n > 200 && i % Math.floor(n/20) !== 0) continue; 
             timeLabels.push((i * dt).toFixed(2));
         }
 
-        // Generate Paths
+        // Run Paths
         for (let path = 0; path < m; path++) {
-            let W = 0;
+            let X = 0; 
             const singlePath = [0]; 
 
             for (let step = 1; step <= n; step++) {
                 const Z = boxMullerTransform();
-                const dW = sigma * sqrt_dt * Z;
-                W += dW;
                 
+                // Euler-Maruyama Formula
+                // dX = drift * dt + diffusion * dW
+                const dX = (mu * dt) + (sigma * sqrt_dt * Z);
+                
+                X += dX;
+                
+                // Optimization: Don't store every point for the chart if n is huge
                 if (n <= 200 || step % Math.floor(n/20) === 0) {
-                    singlePath.push(W);
+                    singlePath.push(X);
                 }
             }
             trajectories.push(singlePath);
-            finalPositions.push(W);
+            finalPositions.push(X);
         }
 
         // Statistics
         const mean = finalPositions.reduce((a, b) => a + b, 0) / m;
         const variance = finalPositions.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / m;
-        const theoreticalVar = Math.pow(sigma, 2) * T;
+        const theoMean = mu * T;
+        const theoVar = Math.pow(sigma, 2) * T;
 
+        // Update Stats Panel
         const statsPanel = document.getElementById('statsOutput');
         statsPanel.innerHTML = `
-            <strong>Simulation Results (t=${T}):</strong><br>
-            Empirical Mean: ${mean.toFixed(4)} (Theoretical: 0.00)<br>
-            Empirical Variance: ${variance.toFixed(4)} (Theoretical: ${theoreticalVar.toFixed(4)})<br>
-            <i>Note: As $m \\to \\infty$, Empirical Variance converges to $T$.</i>
+            <strong>Results (t=${T}):</strong><br>
+            Empirical Mean: ${mean.toFixed(4)} (Theoretical: ${theoMean.toFixed(4)})<br>
+            Empirical Variance: ${variance.toFixed(4)} (Theoretical: ${theoVar.toFixed(4)})
         `;
+        // Trigger MathJax re-render
         if(window.MathJax) { window.MathJax.typesetPromise([statsPanel]); }
 
+        // Draw Charts
         drawPathsChart(timeLabels, trajectories);
-        drawHistogram(finalPositions, sigma, T);
+        drawHistogram(finalPositions, sigma, T, mu);
     }
 
+    // --- 3. Chart Drawing Functions ---
     function drawPathsChart(labels, dataSets) {
         const ctx = document.getElementById('pathsChart').getContext('2d');
         
-        // --- VISUAL FIX: Ghostly Lines ---
-        // We set opacity to 0.25 so overlaps create the "density" effect.
-        const pathsToDraw = dataSets.slice(0, 100).map((pathData) => ({
-            label: '',
-            data: pathData,
-            borderColor: 'rgba(52, 152, 219, 0.25)', // Fixed low opacity Blue
+        // Only draw first 50 paths to save performance/visual clutter
+        const pathsToDraw = dataSets.slice(0, 50).map(() => ({
+            data: [], 
+            borderColor: 'rgba(52, 152, 219, 0.3)',
             borderWidth: 1.5,
             pointRadius: 0,
             fill: false,
-            tension: 0.1 // Slight smoothing
+            tension: 0
         }));
+
+        // Map data correctly
+        dataSets.slice(0, 50).forEach((data, index) => {
+            pathsToDraw[index].data = data;
+        });
 
         if (pathsChartInstance) pathsChartInstance.destroy();
 
@@ -196,24 +217,21 @@
             type: 'line',
             data: { labels: labels, datasets: pathsToDraw },
             options: {
+                animation: false,
                 responsive: true,
                 interaction: { intersect: false },
-                plugins: { 
-                    legend: { display: false }, 
-                    tooltip: { enabled: false }, // Disable tooltip for cleaner view
-                    title: { display: true, text: `Wiener Process (${dataSets.length} trajectories)` } 
-                },
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
                 scales: { 
-                    x: { title: { display: true, text: 'Time (t)' } },
-                    y: { title: { display: true, text: 'Value W(t)' } }
+                    x: { title: { display: true, text: 'Time (t)' }, ticks: { maxTicksLimit: 10 } },
+                    y: { title: { display: true, text: 'Value X(t)' } }
                 }
             }
         });
     }
 
-    function drawHistogram(data, sigma, T) {
+    function drawHistogram(data, sigma, T, mu) {
         const ctx = document.getElementById('histoChart').getContext('2d');
-        const binCount = 20;
+        const binCount = 25;
         const min = Math.min(...data);
         const max = Math.max(...data);
         const interval = (max - min) / binCount;
@@ -222,9 +240,8 @@
         const binLabels = [];
         
         for (let i = 0; i < binCount; i++) {
-            const binStart = min + (i * interval);
-            const binEnd = min + ((i + 1) * interval);
-            binLabels.push(((binStart + binEnd) / 2).toFixed(2));
+            const center = min + (i * interval) + (interval/2);
+            binLabels.push(center.toFixed(2));
         }
 
         data.forEach(val => {
@@ -232,11 +249,13 @@
             bins[index]++;
         });
 
+        // Theoretical Normal Distribution Curve
         const theoreticalData = binLabels.map(x => {
             const xVal = parseFloat(x);
-            const variance = Math.pow(sigma, 2) * T;
-            const sd = Math.sqrt(variance);
-            const pdf = (1 / (sd * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow(xVal / sd, 2));
+            const theoMean = mu * T;
+            const theoSd = sigma * Math.sqrt(T);
+            const exponent = -0.5 * Math.pow((xVal - theoMean) / theoSd, 2);
+            const pdf = (1 / (theoSd * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
             return pdf * data.length * interval; 
         });
 
@@ -248,17 +267,17 @@
                 labels: binLabels,
                 datasets: [
                     {
-                        label: 'Observed Frequency',
+                        label: 'Empirical',
                         data: bins,
-                        backgroundColor: 'rgba(26, 188, 156, 0.6)',
-                        borderColor: 'rgba(26, 188, 156, 1)',
+                        backgroundColor: 'rgba(46, 204, 113, 0.6)',
+                        borderColor: 'rgba(46, 204, 113, 1)',
                         borderWidth: 1,
                         barPercentage: 1.0,
                         categoryPercentage: 1.0
                     },
                     {
                         type: 'line',
-                        label: `Theoretical N(0, ${T})`,
+                        label: 'Theoretical Gaussian',
                         data: theoreticalData,
                         borderColor: '#e74c3c',
                         borderWidth: 2,
@@ -269,14 +288,18 @@
             },
             options: {
                 responsive: true,
-                plugins: { title: { display: true, text: `Distribution at T=${T}` } },
-                scales: { 
-                    x: { title: { display: true, text: 'Final Position' } },
-                    y: { title: { display: true, text: 'Frequency' } }
-                }
+                plugins: { legend: { display: true } },
+                scales: { x: { title: { display: true, text: 'X(T)' } } }
             }
         });
     }
+
+    // --- 4. AUTO-RUN ON LOAD ---
+    // This ensures the professor sees the result immediately upon opening the page
+    window.onload = function() {
+        runSimulation();
+    };
+
 </script>
 
 </body>
