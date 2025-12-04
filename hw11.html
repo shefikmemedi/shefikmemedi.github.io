@@ -97,18 +97,18 @@
 
     <div class="theory-section">
         <h3>Theoretical Background</h3>
-        <p>This homework generalizes the Random Walk (HW 7) to continuous time by solving the Stochastic Differential Equation (SDE):</p>
+        <p>This simulation implements the <strong>Euler-Maruyama method</strong> to solve the Stochastic Differential Equation (SDE) for a Generalized Wiener Process:</p>
         <p style="text-align: center; font-size: 1.2em;">
             $$ dX_t = \mu dt + \sigma dW_t $$
         </p>
-        <p>Using the <strong>Euler-Maruyama</strong> discretization method:</p>
+        <p>The continuous process is approximated discretely as follows:</p>
         <p style="text-align: center; font-size: 1.1em;">
             $$ X_{i+1} = X_i + \mu \Delta t + \sigma \sqrt{\Delta t} Z_i $$
         </p>
         <p>Where $Z_i \sim N(0,1)$ is a standard normal random variable generated via the <strong>Box-Muller transform</strong>.</p>
         <ul>
-            <li>If $\mu = 0$ and $\sigma = 1$, this is a standard Wiener Process.</li>
-            <li>If $\mu \neq 0$, the process has a deterministic trend (drift).</li>
+            <li>If $\mu = 0$ and $\sigma = 1$, the model simulates standard Brownian Motion.</li>
+            <li>If $\mu \neq 0$, the model captures a deterministic drift trend.</li>
         </ul>
     </div>
 </div>
