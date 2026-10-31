@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shefik Memedi | Governance, Risk &amp; Compliance</title>
+<meta name="description" content="Shefik Memedi: Cybersecurity MSc candidate focused on Governance, Risk & Compliance. Embassy experience handling classified data under GDPR-aligned procedures.">
+<meta name="theme-color" content="#070707">
+<style>
+:root{--bg:#070707;--bg2:#0F0E0B;--card:#141310;--line:#2B2616;--txt:#F6F4EE;--mut:#A9A596;--acc:#D4AF37;--acc2:#F0D58A}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--txt);line-height:1.65;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+nav{position:fixed;top:0;left:0;right:0;z-index:10;background:rgba(7,7,7,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;justify-content:space-between;align-items:center;height:60px}
+.logo{font-weight:600;letter-spacing:.02em}.logo b{color:var(--acc)}
+nav ul{display:flex;gap:26px;list-style:none;font-size:14px;color:var(--mut)}
+nav ul a:hover{color:var(--acc)}
+.btn{display:inline-block;padding:12px 22px;border-radius:8px;font-weight:500;font-size:15px;transition:transform .2s,background .2s}
+.btn.p{background:var(--acc);color:#1A1400}.btn.p:hover{transform:translateY(-2px);background:#E8C85A}
+.btn.s{border:1px solid var(--line);color:var(--txt)}.btn.s:hover{border-color:var(--acc);transform:translateY(-2px)}
+header{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:60px}
+header::before{content:"";position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:56px 56px;opacity:.28;animation:drift 20s linear infinite;mask-image:radial-gradient(ellipse at 50% 40%,#000 20%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at 50% 40%,#000 20%,transparent 75%)}
+@keyframes drift{to{background-position:56px 56px}}
+.glow{position:absolute;width:420px;height:420px;border-radius:50%;background:var(--acc2);opacity:.12;filter:blur(90px);right:-80px;top:15%;animation:float 9s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(40px)}}
+.hero{position:relative;display:grid;grid-template-columns:1.4fr 1fr;gap:40px;align-items:center}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--acc);border:1px solid var(--line);padding:6px 14px;border-radius:99px;margin-bottom:22px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--acc);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px rgba(212,175,55,0)}0%{box-shadow:0 0 0 0 rgba(212,175,55,.6)}}
+h1{font-size:clamp(38px,6vw,64px);line-height:1.08;font-weight:600;letter-spacing:-.02em}
+h1 span{color:var(--acc)}
+.role{font-size:clamp(18px,2.4vw,24px);color:var(--mut);margin:18px 0 8px;min-height:1.6em}
+.role b{color:var(--txt);font-weight:500}
+.cur{display:inline-block;width:2px;height:1em;background:var(--acc);margin-left:3px;vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.lead{max-width:540px;color:var(--mut);margin-bottom:30px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.shield{width:100%;max-width:300px;justify-self:center;animation:float 7s ease-in-out infinite}
+section{padding:96px 0}
+.alt{background:var(--bg2)}
+.eyebrow{color:var(--acc);font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+h2{font-size:clamp(28px,4vw,40px);font-weight:600;letter-spacing:-.01em;margin-bottom:14px}
+.sub{color:var(--mut);max-width:620px;margin-bottom:44px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+.stat .n{font-size:34px;font-weight:600;color:var(--acc)}.stat .l{color:var(--mut);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px;transition:transform .25s,border-color .25s}
+.card:hover{transform:translateY(-6px);border-color:var(--acc)}
+.card h3{font-size:18px;margin-bottom:8px;font-weight:600}.card p{color:var(--mut);font-size:15px}
+.ic{width:42px;height:42px;border-radius:10px;background:rgba(212,175,55,.12);color:var(--acc);display:grid;place-items:center;font-size:20px;margin-bottom:16px}
+.pill{display:inline-block;font-size:12px;padding:3px 10px;border-radius:99px;border:1px solid var(--line);color:var(--mut);margin:12px 6px 0 0}
+.pill.on{border-color:var(--acc);color:var(--acc)}
+.fw{display:flex;flex-wrap:wrap;gap:12px}
+.fw div{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-weight:500}
+.fw small{display:block;color:var(--mut);font-weight:400;font-size:12px}
+.tl{border-left:2px solid var(--line);margin-left:6px;padding-left:28px}
+.item{position:relative;margin-bottom:34px}
+.item::before{content:"";position:absolute;left:-36px;top:7px;width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--acc)}
+.item .when{font-size:13px;color:var(--acc)}
+.item h3{font-size:19px;font-weight:600}.item .org{color:var(--mut);font-size:15px;margin-bottom:8px}
+.item ul{padding-left:18px;color:var(--mut);font-size:15px}.item li{margin-bottom:5px}
+.proj .st{font-size:12px;color:#F6F4EE;margin-bottom:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:40px}
+.list{list-style:none}.list li{padding:9px 0;border-bottom:1px solid var(--line);color:var(--mut);display:flex;justify-content:space-between;gap:14px;font-size:15px}
+.list li b{color:var(--txt);font-weight:500}
+.contact{text-align:center}.contact .sub{margin-left:auto;margin-right:auto}
+.links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+footer{padding:28px 0;border-top:1px solid var(--line);color:var(--mut);font-size:13px;text-align:center}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s}
+.rv.in{opacity:1;transform:none}
+@media(max-width:800px){.hero,.two{grid-template-columns:1fr}.shield{max-width:200px;order:-1}.stats{grid-template-columns:1fr 1fr}nav ul{display:none}section{padding:72px 0}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+
+#bar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--acc),#F6E3A1);z-index:20}
+h1 span{background:linear-gradient(90deg,#D4AF37,#F6E3A1,#D4AF37);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}
+@keyframes shine{to{background-position:-200% 0}}
+.photo{position:relative;width:280px;height:280px;justify-self:center}
+.ring{position:absolute;inset:-16px;border-radius:50%;border:1px dashed var(--acc);animation:spin 26s linear infinite}
+.ring::after{content:"";position:absolute;top:-5px;left:50%;width:10px;height:10px;border-radius:50%;background:var(--acc)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pic{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:3px solid var(--acc);background:var(--card);display:grid;place-items:center;font-size:76px;font-weight:600;color:var(--acc);letter-spacing:.04em}
+.pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.mq{border-block:1px solid var(--line);background:var(--bg2);overflow:hidden;padding:16px 0}
+.mq div{display:flex;gap:48px;width:max-content;animation:mq 32s linear infinite;color:var(--mut);font-size:14px;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap}
+.mq span::before{content:"\25C6";color:var(--acc);margin-right:48px}
+@keyframes mq{to{transform:translateX(-50%)}}
+.card{position:relative;overflow:hidden}
+.card::after{content:"";position:absolute;inset:0;background:radial-gradient(260px circle at var(--x,50%) var(--y,50%),rgba(212,175,55,.14),transparent 60%);opacity:0;transition:opacity .3s;pointer-events:none}
+.card:hover::after{opacity:1}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.ph{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px}
+.ph .no{font-size:13px;color:var(--acc);letter-spacing:.14em}
+.ph h3{margin:8px 0;font-weight:600}.ph p{color:var(--mut);font-size:14px}
+.trk{height:3px;background:var(--line);border-radius:3px;margin-top:18px;overflow:hidden}
+.trk i{display:block;height:100%;width:0;background:var(--acc);transition:width 1.4s cubic-bezier(.2,.7,.2,1) .4s}
+.in .trk i{width:100%}
+@media(max-width:800px){.photo{width:210px;height:210px;order:-1}.steps{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.steps{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<nav><div class="wrap"><a class="logo" href="#top">Shefik<b>.</b>Memedi</a>
+<ul><li><a href="#about">About</a></li><li><a href="#focus">Focus</a></li><li><a href="#process">Process</a></li><li><a href="#projects">Projects</a></li><li><a href="#experience">Experience</a></li><li><a href="#contact">Contact</a></li></ul>
+<a class="btn p" href="#contact" style="padding:8px 16px;font-size:14px">Let's talk</a></div></nav>
+
+<header id="top"><div class="glow"></div><div class="wrap hero">
+<div>
+<div class="tag"><span class="dot"></span>Open to junior GRC roles · Switzerland &amp; remote Europe</div>
+<h1>Shefik <span>Memedi</span></h1>
+<p class="role">I turn rules into <b id="typed"></b><span class="cur"></span></p>
+<p class="lead">Cybersecurity MSc candidate focused on Governance, Risk &amp; Compliance. I have protected classified diplomatic data under strict GDPR-aligned procedures, and I am now building the GRC skills to do it at company scale.</p>
+<div class="cta"><a class="btn p" href="#projects">See my work</a><a class="btn s" href="#contact">Get in touch</a></div>
+</div>
+<div class="photo"><div class="ring"></div><div class="pic"><span>SM</span><img src="photo.jpg" alt="Shefik Memedi" onerror="this.remove()"></div></div>
+</div></header>
+<div class="mq" aria-hidden="true"><div><span>ISO 27001</span><span>GDPR</span><span>NIS2</span><span>DORA</span><span>ISO 42001</span><span>Risk assessment</span><span>Policy writing</span><span>Audit readiness</span><span>Third-party risk</span><span>ISO 27001</span><span>GDPR</span><span>NIS2</span><span>DORA</span><span>ISO 42001</span><span>Risk assessment</span><span>Policy writing</span><span>Audit readiness</span><span>Third-party risk</span></div></div>
+
+<section id="about"><div class="wrap">
+<p class="eyebrow rv">About</p><h2 class="rv">Diplomacy taught me discretion. Cybersecurity gives me the framework.</h2>
+<p class="sub rv">At the Embassy of Albania in Rome I handled classified personal data and legal identity documents, enforced access controls and worked under zero tolerance for mistakes. My Luiss thesis studied humans as a security risk. Now, at Sapienza, I study the governance side: how organisations decide what to protect, prove they do it, and improve.</p>
+<div class="stats rv">
+<div class="stat"><div class="n" data-c="0">0</div><div class="l">compliance incidents at the embassy</div></div>
+<div class="stat"><div class="n" data-c="106">0</div><div class="l">/110 BSc, full merit scholarship</div></div>
+<div class="stat"><div class="n" data-c="5">0</div><div class="l">languages, incl. English C1</div></div>
+<div class="stat"><div class="n" data-c="2">0</div><div class="l">embassy terms, re-appointed</div></div>
+</div></div></section>
+
+<section id="focus" class="alt"><div class="wrap">
+<p class="eyebrow rv">Focus</p><h2 class="rv">What I do in GRC</h2>
+<p class="sub rv">The core work of a GRC analyst, and where I am building proof.</p>
+<div class="grid">
+<div class="card rv"><div class="ic">&#9888;</div><h3>Risk assessment</h3><p>Identify assets, threats and vulnerabilities, score likelihood and impact, and recommend treatment.</p></div>
+<div class="card rv"><div class="ic">&#9998;</div><h3>Policy &amp; documentation</h3><p>Policies, standards and procedures that are short, clear and actually usable by staff.</p></div>
+<div class="card rv"><div class="ic">&#10003;</div><h3>Audit readiness</h3><p>Evidence collection, control mapping and gap analysis so audits hold no surprises.</p></div>
+<div class="card rv"><div class="ic">&#128274;</div><h3>Privacy &amp; data handling</h3><p>GDPR-aligned processes, access control and secure chain of custody for sensitive data.</p></div>
+</div>
+<h3 class="rv" style="margin:48px 0 16px;font-weight:600">Frameworks &amp; regulations</h3>
+<div class="fw rv"><div>GDPR<small>working knowledge</small></div><div>ISO/IEC 27001<small>studying</small></div><div>NIS2<small>studying</small></div><div>DORA<small>studying</small></div><div>ISO/IEC 42001<small>AI governance, studying</small></div><div>MITRE ATT&amp;CK<small>foundations</small></div></div>
+</div></section>
+
+<section id="process"><div class="wrap">
+<p class="eyebrow rv">Process</p><h2 class="rv">How I approach every risk</h2>
+<p class="sub rv">Four steps, the same logic behind ISO 27001, applied to any organisation.</p>
+<div class="steps">
+<div class="ph rv"><div class="no">01</div><h3>Identify</h3><p>List the assets, the threats and the weak points. You cannot protect what you cannot see.</p><div class="trk"><i></i></div></div>
+<div class="ph rv"><div class="no">02</div><h3>Assess</h3><p>Score likelihood and impact so the biggest risks come first.</p><div class="trk"><i></i></div></div>
+<div class="ph rv"><div class="no">03</div><h3>Treat</h3><p>Mitigate, accept, transfer or avoid, with a named owner and a deadline.</p><div class="trk"><i></i></div></div>
+<div class="ph rv"><div class="no">04</div><h3>Monitor</h3><p>Measure, review and improve, and keep the evidence an auditor will ask for.</p><div class="trk"><i></i></div></div>
+</div></div></section>
+
+<section id="projects"><div class="wrap">
+<p class="eyebrow rv">Projects</p><h2 class="rv">Portfolio, built in public</h2>
+<p class="sub rv">Practical GRC work I am producing now. Each one will link to a downloadable document.</p>
+<div class="grid">
+<div class="card proj rv"><div class="st">IN PROGRESS</div><h3>Clinic risk register</h3><p>15+ risks for a private clinic: assets, threats, scoring, treatment and ISO 27001 Annex A controls.</p><span class="pill on">Risk</span><span class="pill">ISO 27001</span></div>
+<div class="card proj rv"><div class="st">IN PROGRESS</div><h3>Information security policy</h3><p>One-page policy plus a password standard and a breach response procedure.</p><span class="pill on">Governance</span><span class="pill">Policy</span></div>
+<div class="card proj rv"><div class="st">PLANNED</div><h3>GDPR gap analysis</h3><p>Review of a real company's privacy policy against GDPR requirements, with findings and fixes.</p><span class="pill on">Compliance</span><span class="pill">GDPR</span></div>
+<div class="card proj rv"><div class="st">PLANNED</div><h3>Ransomware incident review</h3><p>WannaCry-style case: what failed, current vs target maturity, and a plain-language answer to the CEO.</p><span class="pill on">Gap analysis</span></div>
+</div></div></section>
+
+<section id="experience" class="alt"><div class="wrap">
+<p class="eyebrow rv">Experience</p><h2 class="rv" style="margin-bottom:44px">Where I have worked</h2>
+<div class="tl">
+<div class="item rv"><div class="when">07.2025 – 09.2025 &amp; 01.2026 – 02.2026</div><h3>Consular Services Operator</h3><div class="org">Embassy of the Republic of Albania · Rome</div>
+<ul><li>Re-appointed for a second term after strong performance in a high-stakes diplomatic environment.</li><li>Managed secure chain of custody for classified personal data and identity documents, with zero compliance incidents.</li><li>Enforced GDPR-aligned privacy protocols, physical security procedures and access controls.</li></ul></div>
+<div class="item rv"><div class="when">06.2024 – 08.2024</div><h3>Diplomatic Intern</h3><div class="org">Embassy of the Republic of Albania · Rome</div>
+<ul><li>Coordinated inter-departmental communication and drafted official correspondence during ministerial visits.</li><li>Gained insight into the physical, administrative and information security of a sovereign mission.</li></ul></div>
+</div></div></section>
+
+<section id="education"><div class="wrap two">
+<div><p class="eyebrow rv">Education</p><h2 class="rv">Studies</h2>
+<div class="tl"><div class="item rv"><div class="when">2025 – 2027 (expected)</div><h3>MSc Cybersecurity</h3><div class="org">Sapienza University of Rome</div><ul><li>Security Governance &amp; Risk Management, Cyber Law, Cyber Threat Intelligence, Network Security</li></ul></div>
+<div class="item rv"><div class="when">2022 – 2025</div><h3>BSc Management &amp; Computer Science</h3><div class="org">Luiss Guido Carli · 106/110</div><ul><li>Thesis: Cybersecurity and Human Behavior, on social engineering vulnerabilities</li></ul></div></div></div>
+<div><p class="eyebrow rv">Credentials</p><h2 class="rv">Training &amp; languages</h2>
+<ul class="list rv"><li><b>Certified in Cybersecurity (CC)</b><span>ISC2</span></li><li><b>Cyber Threat Intelligence 101</b><span>arcX</span></li><li><b>Introduction to Cybersecurity</b><span>Cisco</span></li><li><b>Pre Security Path</b><span>TryHackMe</span></li><li><b>Albanian</b><span>Native</span></li><li><b>English · Macedonian</b><span>C1</span></li><li><b>Turkish</b><span>B2</span></li><li><b>Italian</b><span>A2</span></li></ul></div>
+</div></section>
+
+<section id="contact" class="alt contact"><div class="wrap">
+<p class="eyebrow rv">Contact</p><h2 class="rv">Let's build something trustworthy.</h2>
+<p class="sub rv">I am looking for a junior GRC or compliance role in Switzerland or remote within Europe. Write to me, I reply fast.</p>
+<div class="links rv"><a class="btn p" href="mailto:shefikmemedi50@gmail.com">shefikmemedi50@gmail.com</a><a class="btn s" href="https://linkedin.com/in/shefikmemedi" target="_blank" rel="noopener">LinkedIn</a></div>
+</div></section>
+
+<footer>&copy; 2026 Shefik Memedi · Rome, Italy</footer>
+
+<script>
+const words=["policies people follow","risks leaders can decide on","evidence auditors trust","compliance that works"];
+const el=document.getElementById("typed");let w=0,c=0,del=false;
+function tick(){const t=words[w];el.textContent=t.slice(0,c);
+if(!del&&c<t.length){c++;setTimeout(tick,60)}
+else if(!del){del=true;setTimeout(tick,1600)}
+else if(c>0){c--;setTimeout(tick,28)}
+else{del=false;w=(w+1)%words.length;setTimeout(tick,300)}}
+tick();
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");
+if(e.target.querySelectorAll){e.target.querySelectorAll("[data-c]").forEach(n=>{const to=+n.dataset.c;let v=0;const s=Math.max(1,Math.ceil(to/40));const i=setInterval(()=>{v=Math.min(to,v+s);n.textContent=v;if(v>=to)clearInterval(i)},30)})}
+io.unobserve(e.target)}}),{threshold:.15});
+document.querySelectorAll(".rv").forEach((n,i)=>{n.style.transitionDelay=(i%4)*80+"ms";io.observe(n)});
+
+window.addEventListener("scroll",()=>{const h=document.documentElement;document.getElementById("bar").style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+"%"},{passive:true});
+document.querySelectorAll(".card").forEach(c=>c.addEventListener("mousemove",e=>{const r=c.getBoundingClientRect();c.style.setProperty("--x",(e.clientX-r.left)+"px");c.style.setProperty("--y",(e.clientY-r.top)+"px")}));
+</script>
+</body>
+</html>
